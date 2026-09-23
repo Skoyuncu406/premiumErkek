@@ -1,26 +1,1132 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+
+/* =========================================================
+   ARES DESIGN SYSTEM
+========================================================= */
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --ares-background: #f5f0e8;
+  --ares-background-soft: #faf8f3;
+  --ares-background-warm: #eee5da;
+
+  --ares-brown: #a47c5b;
+  --ares-brown-hover: #8e684a;
+  --ares-brown-dark: #76553d;
+
+  --ares-dark: #35271f;
+  --ares-dark-deep: #211a16;
+
+  --ares-gold: #b89555;
+  --ares-gold-soft: #c9ad78;
+
+  --ares-foreground: #211a16;
+
+  --ares-muted: #75685f;
+  --ares-muted-light: #9a8d83;
+
+  --ares-border: #ddd2c5;
+  --ares-border-dark: #c7b8a8;
+
+  --ares-white: #ffffff;
+
+
+  /* =======================================================
+     SHADCN
+  ======================================================== */
+
+  --background: #f5f0e8;
+  --foreground: #211a16;
+
+  --card: #faf8f3;
+  --card-foreground: #211a16;
+
+  --popover: #faf8f3;
+  --popover-foreground: #211a16;
+
+  --primary: #35271f;
+  --primary-foreground: #faf8f3;
+
+  --secondary: #eee5da;
+  --secondary-foreground: #35271f;
+
+  --muted: #eee5da;
+  --muted-foreground: #75685f;
+
+  --accent: #b89555;
+  --accent-foreground: #211a16;
+
+  --destructive: #9f3a38;
+
+  --border: #ddd2c5;
+  --input: #ddd2c5;
+  --ring: #a47c5b;
+
+  --radius: 0.375rem;
+
+
+  /* =======================================================
+     LAYOUT
+  ======================================================== */
+
+  --ares-container: 1440px;
+  --ares-container-wide: 1680px;
+
+  --ares-padding-mobile: 20px;
+  --ares-padding-tablet: 32px;
+  --ares-padding-desktop: 48px;
+  --ares-padding-wide: 64px;
+
+
+  /* =======================================================
+     TRANSITIONS
+  ======================================================== */
+
+  --ares-transition-fast: 180ms ease;
+
+  --ares-transition: 300ms ease;
+
+  --ares-transition-slow:
+    500ms cubic-bezier(0.22, 1, 0.36, 1);
 }
+
+
+/* =========================================================
+   TAILWIND THEME
+========================================================= */
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  --color-destructive: var(--destructive);
+
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --radius-sm: calc(var(--radius) - 2px);
+  --radius-md: var(--radius);
+  --radius-lg: calc(var(--radius) + 2px);
+  --radius-xl: calc(var(--radius) + 6px);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+
+/* =========================================================
+   RESET
+========================================================= */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  width: 100%;
+  min-height: 100%;
+
+  scroll-behavior: smooth;
+
+  text-rendering: optimizeLegibility;
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  width: 100%;
+  min-height: 100vh;
+
+  margin: 0;
+
+  overflow-x: hidden;
+
+  background: var(--ares-background);
+
+  color: var(--ares-foreground);
+
+  font-family:
+    var(--font-manrope),
+    Arial,
+    Helvetica,
+    sans-serif;
+}
+
+body,
+button,
+input,
+textarea,
+select {
+  font-family:
+    var(--font-manrope),
+    Arial,
+    Helvetica,
+    sans-serif;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+img {
+  height: auto;
+}
+
+input,
+button,
+textarea,
+select {
+  border: 0;
+  outline: none;
+}
+
+ul,
+ol {
+  margin: 0;
+  padding: 0;
+
+  list-style: none;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+  margin: 0;
+}
+
+
+/* =========================================================
+   TYPOGRAPHY
+========================================================= */
+
+.font-editorial {
+  font-family:
+    var(--font-cormorant),
+    Georgia,
+    serif;
+}
+
+.font-ui {
+  font-family:
+    var(--font-manrope),
+    Arial,
+    Helvetica,
+    sans-serif;
+}
+
+.ares-display {
+  font-family:
+    var(--font-cormorant),
+    Georgia,
+    serif;
+
+  font-weight: 500;
+
+  line-height: 0.9;
+
+  letter-spacing: -0.035em;
+}
+
+.ares-heading {
+  font-family:
+    var(--font-cormorant),
+    Georgia,
+    serif;
+
+  font-weight: 500;
+
+  line-height: 1;
+
+  letter-spacing: -0.025em;
+}
+
+.ares-eyebrow {
+  font-family:
+    var(--font-manrope),
+    Arial,
+    Helvetica,
+    sans-serif;
+
+  font-size: 0.7rem;
+
+  font-weight: 600;
+
+  line-height: 1.2;
+
+  letter-spacing: 0.18em;
+
+  text-transform: uppercase;
+}
+
+.ares-body {
+  color: var(--ares-muted);
+
+  font-size: 0.95rem;
+
+  font-weight: 400;
+
+  line-height: 1.75;
+}
+
+
+/* =========================================================
+   CONTAINERS
+========================================================= */
+
+.ares-container {
+  width: 100%;
+
+  max-width: var(--ares-container);
+
+  margin-inline: auto;
+
+  padding-inline: var(--ares-padding-mobile);
+}
+
+.ares-container-wide {
+  width: 100%;
+
+  max-width: var(--ares-container-wide);
+
+  margin-inline: auto;
+
+  padding-inline: var(--ares-padding-mobile);
+}
+
+
+/* =========================================================
+   SECTIONS
+========================================================= */
+
+.ares-section {
+  position: relative;
+
+  width: 100%;
+
+  padding-block: 80px;
+}
+
+.ares-section-soft {
+  background: var(--ares-background-soft);
+}
+
+.ares-section-warm {
+  background: var(--ares-background-warm);
+}
+
+.ares-section-dark {
+  background: var(--ares-dark);
+
+  color: var(--ares-background-soft);
+}
+
+
+/* =========================================================
+   LINKS
+========================================================= */
+
+.ares-link {
+  position: relative;
+
+  display: inline-flex;
+
+  width: fit-content;
+
+  align-items: center;
+
+  font-size: 0.75rem;
+
+  font-weight: 600;
+
+  letter-spacing: 0.12em;
+
+  text-transform: uppercase;
+}
+
+.ares-link::after {
+  content: "";
+
+  position: absolute;
+
+  right: 0;
+  bottom: -5px;
+  left: 0;
+
+  height: 1px;
+
+  background: currentColor;
+
+  transform: scaleX(0);
+
+  transform-origin: right center;
+
+  transition:
+    transform
+    var(--ares-transition-slow);
+}
+
+.ares-link:hover::after {
+  transform: scaleX(1);
+
+  transform-origin: left center;
+}
+
+
+/* =========================================================
+   BUTTONS
+========================================================= */
+
+.ares-button {
+  display: inline-flex;
+
+  min-height: 48px;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 10px;
+
+  padding: 0 28px;
+
+  border: 1px solid var(--ares-dark);
+
+  background: var(--ares-dark);
+
+  color: var(--ares-background-soft);
+
+  font-size: 0.72rem;
+
+  font-weight: 600;
+
+  letter-spacing: 0.14em;
+
+  text-transform: uppercase;
+
+  transition:
+    background-color var(--ares-transition),
+    color var(--ares-transition),
+    border-color var(--ares-transition);
+}
+
+.ares-button:hover {
+  background: transparent;
+
+  color: var(--ares-dark);
+}
+
+.ares-button-outline {
+  background: transparent;
+
+  color: var(--ares-dark);
+}
+
+.ares-button-outline:hover {
+  background: var(--ares-dark);
+
+  color: var(--ares-background-soft);
+}
+
+
+/* =========================================================
+   STANDARD INPUTS
+========================================================= */
+
+.ares-input {
+  width: 100%;
+
+  min-height: 48px;
+
+  padding: 0 2px;
+
+  border-bottom:
+    1px solid
+    var(--ares-border-dark);
+
+  border-radius: 0;
+
+  background: transparent;
+
+  color: var(--ares-foreground);
+
+  transition:
+    border-color var(--ares-transition),
+    color var(--ares-transition);
+}
+
+.ares-input::placeholder {
+  color: var(--ares-muted-light);
+}
+
+.ares-input:focus {
+  border-color: var(--ares-dark);
+}
+
+
+/* =========================================================
+   ACCOUNT INPUTS
+========================================================= */
+
+.ares-account-input {
+  width: 100%;
+
+  min-height: 48px;
+
+  border: 0;
+
+  border-bottom:
+    1px solid
+    var(--ares-border-dark);
+
+  border-radius: 0;
+
+  outline: none;
+
+  box-shadow: none;
+
+  -webkit-appearance: none;
+  appearance: none;
+
+  /*
+    ÖNEMLİ:
+    Input boşken, focus olduğunda ve yazı yazıldığında
+    arka plan değişmeyecek.
+  */
+
+  background-color: transparent;
+
+  color: var(--ares-foreground);
+
+  transition:
+    border-color var(--ares-transition),
+    color var(--ares-transition);
+}
+
+
+/* =========================================================
+   ACCOUNT INPUT PLACEHOLDER
+========================================================= */
+
+.ares-account-input::placeholder {
+  color: var(--ares-muted-light);
+
+  opacity: 1;
+}
+
+
+/* =========================================================
+   ACCOUNT INPUT HOVER
+========================================================= */
+
+.ares-account-input:hover {
+  background-color: transparent;
+
+  border-bottom-color:
+    var(--ares-border-dark);
+}
+
+
+/* =========================================================
+   ACCOUNT INPUT FOCUS
+========================================================= */
+
+.ares-account-input:focus,
+.ares-account-input:focus-visible,
+.ares-account-input:active {
+  background-color:
+    transparent !important;
+
+  border-bottom-color:
+    var(--ares-dark);
+
+  outline:
+    none !important;
+
+  outline-offset:
+    0 !important;
+
+  box-shadow:
+    none !important;
+}
+
+
+/* =========================================================
+   ACCOUNT INPUT WITH VALUE
+========================================================= */
+
+/*
+  Kullanıcı input içerisine bir şey yazdığında
+  arka plan kesinlikle beyaza dönmez.
+*/
+
+.ares-account-input:not(:placeholder-shown) {
+  background-color:
+    transparent !important;
+
+  color:
+    var(--ares-foreground);
+}
+
+.ares-account-input:not(:placeholder-shown):hover {
+  background-color:
+    transparent !important;
+}
+
+.ares-account-input:not(:placeholder-shown):focus,
+.ares-account-input:not(:placeholder-shown):focus-visible {
+  background-color:
+    transparent !important;
+
+  outline:
+    none !important;
+
+  box-shadow:
+    none !important;
+}
+
+
+/* =========================================================
+   ACCOUNT INPUT AUTOFILL
+========================================================= */
+
+/*
+  Chrome / Edge kayıtlı e-posta veya şifreyi
+  otomatik doldurduğunda tarayıcının kendi
+  beyaz / sarı / mavi arka planını engeller.
+
+  AccountPage section:
+  --ares-background-soft (#faf8f3)
+*/
+
+.ares-account-input:-webkit-autofill,
+.ares-account-input:-webkit-autofill:hover,
+.ares-account-input:-webkit-autofill:focus,
+.ares-account-input:-webkit-autofill:active {
+  -webkit-text-fill-color:
+    var(--ares-foreground) !important;
+
+  caret-color:
+    var(--ares-foreground);
+
+  -webkit-box-shadow:
+    0 0 0 1000px
+    var(--ares-background-soft)
+    inset !important;
+
+  box-shadow:
+    0 0 0 1000px
+    var(--ares-background-soft)
+    inset !important;
+
+  border-bottom:
+    1px solid
+    var(--ares-dark) !important;
+
+  outline:
+    none !important;
+
+  outline-offset:
+    0 !important;
+}
+
+
+/* =========================================================
+   FOOTER NEWSLETTER INPUT
+========================================================= */
+
+.ares-footer-email {
+  border: 0;
+
+  border-radius: 0;
+
+  outline: none;
+
+  box-shadow: none;
+
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.ares-footer-email:focus,
+.ares-footer-email:focus-visible,
+.ares-footer-email:active {
+  outline:
+    none !important;
+
+  outline-offset:
+    0 !important;
+
+  box-shadow:
+    none !important;
+}
+
+
+/* =========================================================
+   DIVIDER
+========================================================= */
+
+.ares-divider {
+  width: 100%;
+
+  height: 1px;
+
+  background: var(--ares-border);
+}
+
+
+/* =========================================================
+   IMAGES
+========================================================= */
+
+.ares-image {
+  width: 100%;
+
+  height: 100%;
+
+  object-fit: cover;
+}
+
+.ares-image-wrap {
+  position: relative;
+
+  width: 100%;
+
+  overflow: hidden;
+}
+
+
+/* =========================================================
+   HERO IMAGE
+========================================================= */
+
+.ares-hero-image {
+  object-fit: cover;
+
+  object-position: 58% center;
+}
+
+
+/* =========================================================
+   ANNOUNCEMENT MARQUEE
+========================================================= */
+
+.ares-announcement {
+  position: relative;
+
+  width: 100%;
+
+  overflow: hidden;
+
+  border-bottom:
+    1px solid
+    rgb(255 255 255 / 0.08);
+
+  background:
+    var(--ares-dark);
+
+  color:
+    var(--ares-background-soft);
+}
+
+.ares-announcement-track {
+  display: flex;
+
+  width: max-content;
+
+  animation:
+    ares-announcement-scroll
+    36s
+    linear
+    infinite;
+
+  will-change: transform;
+}
+
+.ares-announcement-group {
+  display: flex;
+
+  flex-shrink: 0;
+
+  align-items: center;
+}
+
+.ares-announcement-item {
+  display: flex;
+
+  min-height: 32px;
+
+  flex-shrink: 0;
+
+  align-items: center;
+
+  white-space: nowrap;
+}
+
+.ares-announcement-item > span:first-child {
+  font-family:
+    var(--font-manrope),
+    Arial,
+    Helvetica,
+    sans-serif;
+
+  font-size: 9px;
+
+  font-weight: 500;
+
+  letter-spacing: 0.18em;
+
+  text-transform: uppercase;
+
+  opacity: 0.9;
+}
+
+.ares-announcement-dot {
+  width: 3px;
+
+  height: 3px;
+
+  flex-shrink: 0;
+
+  margin-inline: 32px;
+
+  border-radius: 999px;
+
+  background:
+    var(--ares-gold);
+}
+
+@keyframes ares-announcement-scroll {
+  from {
+    transform:
+      translateX(0);
+  }
+
+  to {
+    transform:
+      translateX(-50%);
+  }
+}
+
+
+/* =========================================================
+   SELECTION
+========================================================= */
+
+::selection {
+  background:
+    var(--ares-dark);
+
+  color:
+    var(--ares-background-soft);
+}
+
+
+/* =========================================================
+   SCROLLBAR
+========================================================= */
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background:
+    var(--ares-background);
+}
+
+::-webkit-scrollbar-thumb {
+  background:
+    var(--ares-border-dark);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background:
+    var(--ares-brown);
+}
+
+
+/* =========================================================
+   ACCESSIBILITY
+========================================================= */
+
+:focus-visible {
+  outline:
+    1px solid
+    var(--ares-brown);
+
+  outline-offset: 4px;
+}
+
+
+/*
+  Footer newsletter ve Account inputları
+  global focus outline kullanmaz.
+*/
+
+.ares-footer-email:focus-visible,
+.ares-account-input:focus-visible {
+  outline:
+    none !important;
+
+  outline-offset:
+    0 !important;
+
+  box-shadow:
+    none !important;
+}
+
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (min-width: 640px) {
+  .ares-hero-image {
+    object-position:
+      60% center;
+  }
+}
+
+@media (min-width: 768px) {
+  .ares-container,
+  .ares-container-wide {
+    padding-inline:
+      var(--ares-padding-tablet);
+  }
+
+  .ares-section {
+    padding-block: 100px;
+  }
+
+  .ares-body {
+    font-size: 1rem;
+  }
+
+  .ares-announcement-item {
+    min-height: 34px;
+  }
+
+  .ares-announcement-item > span:first-child {
+    font-size: 10px;
+  }
+
+  .ares-announcement-dot {
+    margin-inline: 40px;
+  }
+}
+
+
+/* =========================================================
+   DESKTOP
+========================================================= */
+
+@media (min-width: 1024px) {
+  .ares-container,
+  .ares-container-wide {
+    padding-inline:
+      var(--ares-padding-desktop);
+  }
+
+  .ares-section {
+    padding-block: 120px;
+  }
+
+  .ares-hero-image {
+    object-position:
+      center center;
+  }
+}
+
+
+/* =========================================================
+   SHORT / WIDE DESKTOP
+========================================================= */
+
+@media (min-width: 1024px) and (max-height: 900px) {
+  .ares-hero-image {
+    object-position:
+      center 38%;
+  }
+}
+
+
+/* =========================================================
+   LARGE DESKTOP
+========================================================= */
+
+@media (min-width: 1536px) {
+  .ares-container,
+  .ares-container-wide {
+    padding-inline:
+      var(--ares-padding-wide);
+  }
+
+  .ares-section {
+    padding-block: 140px;
+  }
+
+  .ares-hero-image {
+    object-position:
+      center center;
+  }
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .ares-announcement-track {
+    animation: none;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration:
+      0.01ms !important;
+
+    animation-iteration-count:
+      1 !important;
+
+    transition-duration:
+      0.01ms !important;
+  }
+}
+
+/* =========================================================
+   ARES SEARCH INPUT
+========================================================= */
+
+.ares-search-input {
+  border: 0 !important;
+  outline: none !important;
+  outline-offset: 0 !important;
+  box-shadow: none !important;
+
+  background-color: transparent !important;
+
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.ares-search-input:hover {
+  border: 0 !important;
+  outline: none !important;
+  outline-offset: 0 !important;
+  box-shadow: none !important;
+
+  background-color: transparent !important;
+}
+
+.ares-search-input:focus {
+  border: 0 !important;
+  outline: none !important;
+  outline-offset: 0 !important;
+  box-shadow: none !important;
+
+  background-color: transparent !important;
+}
+
+.ares-search-input:focus-visible {
+  border: 0 !important;
+  outline: none !important;
+  outline-offset: 0 !important;
+  box-shadow: none !important;
+
+  background-color: transparent !important;
+}
+
+.ares-search-input:active {
+  border: 0 !important;
+  outline: none !important;
+  outline-offset: 0 !important;
+  box-shadow: none !important;
+
+  background-color: transparent !important;
+}
+
+/* Chrome / Edge / Safari search decorations */
+
+.ares-search-input::-webkit-search-decoration,
+.ares-search-input::-webkit-search-cancel-button,
+.ares-search-input::-webkit-search-results-button,
+.ares-search-input::-webkit-search-results-decoration {
+  -webkit-appearance: none;
+  appearance: none;
+
+  display: none;
+}
+
+/* Autofill */
+
+.ares-search-input:-webkit-autofill,
+.ares-search-input:-webkit-autofill:hover,
+.ares-search-input:-webkit-autofill:focus,
+.ares-search-input:-webkit-autofill:active {
+  -webkit-text-fill-color: var(--ares-dark-deep) !important;
+  caret-color: var(--ares-dark-deep);
+
+  -webkit-box-shadow:
+    0 0 0 1000px var(--ares-background-soft) inset !important;
+
+  box-shadow:
+    0 0 0 1000px var(--ares-background-soft) inset !important;
+
+  border: 0 !important;
+  outline: none !important;
 }
