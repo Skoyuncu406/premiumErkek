@@ -4,17 +4,44 @@ import FavoritesPage from "@/components/favorites/FavoritesPage";
 
 export const metadata = {
   title: "Favoriler",
-  description: "ARES favorilerinize eklediğiniz ürünleri görüntüleyin.",
+  description:
+    "ARES favorilerinize eklediğiniz premium erkek giyim parçalarını görüntüleyin.",
 };
 
-export default function FavorilerPage() {
+/* =========================================================
+   FAVORITES PAGE
+========================================================= */
+
+export default function Favorites() {
   return (
     <main>
+      {/* ===================================================
+          NAVBAR
+      ==================================================== */}
+
       <Navbar />
 
-      <div className="h-[108px] lg:h-[126px]" />
+      {/* ===================================================
+          FIXED NAVBAR OFFSET
+
+          Mobile:
+          Announcement 34px + Navbar 68px = 102px
+
+          Desktop:
+          Announcement 34px + Navbar 92px = 126px
+      ==================================================== */}
+
+      <div className="h-[102px] lg:h-[126px]" />
+
+      {/* ===================================================
+          FAVORITES CONTENT
+      ==================================================== */}
 
       <FavoritesPage />
+
+      {/* ===================================================
+          FOOTER
+      ==================================================== */}
 
       <Footer />
     </main>

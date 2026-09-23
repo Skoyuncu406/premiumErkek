@@ -5,17 +5,43 @@ import CollectionsPage from "@/components/collections/CollectionsPage";
 export const metadata = {
   title: "Koleksiyonlar",
   description:
-    "ARES erkek giyim koleksiyonlarını keşfedin. Modern terzilik, premium dış giyim ve zamansız gardırop parçaları.",
+    "ARES koleksiyonlarını keşfedin. Modern terzilik, seçkin dış giyim ve zamansız günlük erkek giyim parçaları.",
 };
 
-export default function KoleksiyonlarPage() {
+/* =========================================================
+   COLLECTIONS PAGE
+========================================================= */
+
+export default function Collections() {
   return (
     <main>
+      {/* ===================================================
+          NAVBAR
+      ==================================================== */}
+
       <Navbar />
 
-      <div className="h-[108px] lg:h-[126px]" />
+      {/* ===================================================
+          FIXED NAVBAR OFFSET
+
+          Mobile:
+          Announcement 34px + Navbar 68px = 102px
+
+          Desktop:
+          Announcement 34px + Navbar 92px = 126px
+      ==================================================== */}
+
+      <div className="h-[102px] lg:h-[126px]" />
+
+      {/* ===================================================
+          COLLECTIONS
+      ==================================================== */}
 
       <CollectionsPage />
+
+      {/* ===================================================
+          FOOTER
+      ==================================================== */}
 
       <Footer />
     </main>

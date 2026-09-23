@@ -2,40 +2,52 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import {
+  Check,
   ChevronLeft,
   Heart,
   Minus,
   Plus,
-  Check,
 } from "lucide-react";
 
 import SizeGuide from "./SizeGuide";
 import useShopStore from "@/store/useShopStore";
 
-export default function ProductDetail({ product }) {
-  /* =========================================================
-     GALLERY
-  ========================================================== */
+/* =========================================================
+   PRODUCT DETAIL
+========================================================= */
 
-  const gallery =
-    Array.isArray(product?.images) &&
-    product.images.length > 0
-      ? product.images
-      : [product.image];
+export default function ProductDetail({ product }) {
+  /* =======================================================
+     GALLERY
+  ======================================================== */
+
+  const gallery = useMemo(() => {
+    if (
+      Array.isArray(product?.images) &&
+      product.images.length > 0
+    ) {
+      return product.images.filter(Boolean);
+    }
+
+    if (product?.image) {
+      return [product.image];
+    }
+
+    return ["/images/products/product-01.jpg"];
+  }, [product]);
 
   const [activeImage, setActiveImage] =
     useState(gallery[0]);
 
-
-  /* =========================================================
-     LOCAL PRODUCT STATE
-  ========================================================== */
+  /* =======================================================
+     LOCAL STATE
+  ======================================================== */
 
   const [selectedSize, setSelectedSize] =
-    useState(null);
+    useState("");
 
   const [quantity, setQuantity] =
     useState(1);
@@ -49,43 +61,78 @@ export default function ProductDetail({ product }) {
   const [addedToCart, setAddedToCart] =
     useState(false);
 
+  /* =======================================================
+     SHOP STORE
+  ======================================================== */
 
-  /* =========================================================
-     GLOBAL SHOP STATE
-  ========================================================== */
-
-  const addToCart =
-    useShopStore((state) => state.addToCart);
-
-  const toggleFavorite =
-    useShopStore((state) => state.toggleFavorite);
-
-  const favorites =
-    useShopStore((state) => state.favorites);
-
-  const favorite = favorites.some(
-    (item) => item.id === product.id
+  const addToCart = useShopStore(
+    (state) => state.addToCart
   );
 
+  const toggleFavorite = useShopStore(
+    (state) => state.toggleFavorite
+  );
 
-  /* =========================================================
+  const favorites = useShopStore(
+    (state) => state.favorites
+  );
+
+  /* =======================================================
+     FAVORITE STATE
+  ======================================================== */
+
+  const favorite = Array.isArray(favorites)
+    ? favorites.some(
+        (item) =>
+          String(item?.id) ===
+          String(product?.id)
+      )
+    : false;
+
+  /* =======================================================
+     PRODUCT SIZES
+  ======================================================== */
+
+  const productSizes =
+    Array.isArray(product?.sizes)
+      ? product.sizes
+      : [];
+
+  /* =======================================================
+     RESET ACTIVE IMAGE
+  ======================================================== */
+
+  useEffect(() => {
+    setActiveImage(gallery[0]);
+  }, [gallery]);
+
+  /* =======================================================
      QUANTITY
-  ========================================================== */
+  ======================================================== */
 
   function increaseQuantity() {
-    setQuantity((current) => current + 1);
+    setQuantity((current) => {
+      const value = Number(current) || 1;
+
+      return value + 1;
+    });
+
+    setAddedToCart(false);
   }
 
   function decreaseQuantity() {
-    setQuantity((current) =>
-      Math.max(1, current - 1)
-    );
+    setQuantity((current) => {
+      const value = Number(current) || 1;
+
+      return Math.max(1, value - 1);
+    });
+
+    setAddedToCart(false);
   }
 
-
-  /* =========================================================
+  /* =======================================================
      SIZE
-  ========================================================== */
+  ======================================================== */
 
   function handleSizeSelect(size) {
     setSelectedSize(size);
@@ -93,21 +140,34 @@ export default function ProductDetail({ product }) {
     setAddedToCart(false);
   }
 
-
-  /* =========================================================
+  /* =======================================================
      ADD TO CART
-  ========================================================== */
+  ======================================================== */
 
   function handleAddToCart() {
-    if (!selectedSize) {
-      setSizeError(true);
+    if (!product) {
       return;
     }
 
+    if (!selectedSize) {
+      setSizeError(true);
+      setAddedToCart(false);
+
+      return;
+    }
+
+    const safeQuantity =
+      Math.max(
+        1,
+        Number(quantity) || 1
+      );
+
     addToCart({
-      product,
+      product: {
+        ...product,
+      },
       size: selectedSize,
-      quantity,
+      quantity: safeQuantity,
     });
 
     setSizeError(false);
@@ -118,18 +178,31 @@ export default function ProductDetail({ product }) {
     }, 1800);
   }
 
+  /* =======================================================
+     FAVORITE
+  ======================================================== */
 
-  /* =========================================================
+  function handleFavorite() {
+    if (!product) {
+      return;
+    }
+
+    toggleFavorite(product);
+  }
+
+  /* =======================================================
      RENDER
-  ========================================================== */
+  ======================================================== */
 
   return (
     <>
       <section
         className="
           min-h-screen
+
           bg-[var(--ares-background-soft)]
-          pt-[108px]
+
+          pt-[102px]
 
           lg:h-screen
           lg:min-h-0
@@ -137,9 +210,9 @@ export default function ProductDetail({ product }) {
           lg:pt-[126px]
         "
       >
-        {/* ===================================================
+        {/* =================================================
             BREADCRUMB
-        ==================================================== */}
+        ================================================== */}
 
         <div
           className="
@@ -152,7 +225,15 @@ export default function ProductDetail({ product }) {
           "
         >
           <div className="ares-container-wide h-full">
-            <div className="flex h-full items-center gap-3">
+            <div
+              className="
+                flex
+                h-full
+
+                items-center
+                gap-3
+              "
+            >
               <Link
                 href="/urunler"
                 className="
@@ -190,7 +271,11 @@ export default function ProductDetail({ product }) {
                 Giyim
               </Link>
 
-              <span className="text-[var(--ares-border-dark)]">
+              <span
+                className="
+                  text-[var(--ares-border-dark)]
+                "
+              >
                 /
               </span>
 
@@ -207,16 +292,15 @@ export default function ProductDetail({ product }) {
                   text-[var(--ares-dark-deep)]
                 "
               >
-                {product.name}
+                {product?.name}
               </span>
             </div>
           </div>
         </div>
 
-
-        {/* ===================================================
+        {/* =================================================
             PRODUCT AREA
-        ==================================================== */}
+        ================================================== */}
 
         <div
           className="
@@ -228,7 +312,9 @@ export default function ProductDetail({ product }) {
           <div
             className="
               grid
+
               gap-8
+
               py-6
 
               lg:h-full
@@ -239,9 +325,9 @@ export default function ProductDetail({ product }) {
               xl:gap-14
             "
           >
-            {/* =================================================
+            {/* =============================================
                 LEFT / PRODUCT GALLERY
-            ================================================== */}
+            ============================================== */}
 
             <div
               className="
@@ -274,9 +360,9 @@ export default function ProductDetail({ product }) {
                   lg:gap-5
                 "
               >
-                {/* =============================================
+                {/* =========================================
                     MAIN IMAGE
-                ============================================== */}
+                ========================================== */}
 
                 <div
                   className="
@@ -310,20 +396,18 @@ export default function ProductDetail({ product }) {
                   <Image
                     key={activeImage}
                     src={activeImage}
-                    alt={product.name}
+                    alt={
+                      product?.name ||
+                      "ARES ürün"
+                    }
                     fill
                     priority
-                    sizes="
-                      (max-width: 639px) 100vw,
-                      (max-width: 1023px) 540px,
-                      520px
-                    "
+                    sizes="(max-width: 639px) 100vw, (max-width: 1023px) 540px, 520px"
                     className="
                       object-cover
                       object-center
 
                       transition-transform
-
                       duration-[1200ms]
 
                       ease-[cubic-bezier(0.22,1,0.36,1)]
@@ -332,7 +416,7 @@ export default function ProductDetail({ product }) {
                     "
                   />
 
-                  {product.isNew && (
+                  {product?.isNew && (
                     <span
                       className="
                         absolute
@@ -363,10 +447,9 @@ export default function ProductDetail({ product }) {
                   )}
                 </div>
 
-
-                {/* =============================================
-                    SIDE THUMBNAILS
-                ============================================== */}
+                {/* =========================================
+                    DESKTOP / TABLET THUMBNAILS
+                ========================================== */}
 
                 {gallery.length > 1 && (
                   <div
@@ -381,95 +464,104 @@ export default function ProductDetail({ product }) {
                       sm:flex
                     "
                   >
-                    {gallery.map((image, index) => {
-                      const active =
-                        activeImage === image;
+                    {gallery.map(
+                      (image, index) => {
+                        const active =
+                          activeImage ===
+                          image;
 
-                      return (
-                        <button
-                          key={`${image}-${index}`}
-                          type="button"
-                          onClick={() =>
-                            setActiveImage(image)
-                          }
-                          aria-label={`${product.name} görsel ${
-                            index + 1
-                          }`}
-                          className={`
-                            group/thumb
-
-                            relative
-
-                            h-[78px]
-                            w-[58px]
-
-                            overflow-hidden
-
-                            bg-[var(--ares-background-warm)]
-
-                            transition-all
-                            duration-300
-
-                            lg:h-[86px]
-                            lg:w-[64px]
-
-                            ${
-                              active
-                                ? "opacity-100"
-                                : `
-                                  opacity-45
-                                  hover:opacity-100
-                                `
+                        return (
+                          <button
+                            key={`${image}-${index}`}
+                            type="button"
+                            onClick={() =>
+                              setActiveImage(
+                                image
+                              )
                             }
-                          `}
-                        >
-                          <Image
-                            src={image}
-                            alt=""
-                            fill
-                            sizes="64px"
-                            className="
-                              object-cover
-                              object-center
-
-                              transition-transform
-                              duration-500
-
-                              group-hover/thumb:scale-[1.05]
-                            "
-                          />
-
-                          <span
+                            aria-label={`${
+                              product?.name ||
+                              "Ürün"
+                            } görsel ${
+                              index + 1
+                            }`}
                             className={`
-                              absolute
-                              bottom-0
-                              left-0
+                              group/thumb
 
-                              h-[2px]
+                              relative
 
-                              bg-[var(--ares-dark-deep)]
+                              h-[78px]
+                              w-[58px]
+
+                              overflow-hidden
+
+                              bg-[var(--ares-background-warm)]
 
                               transition-all
-                              duration-500
+                              duration-300
+
+                              lg:h-[86px]
+                              lg:w-[64px]
 
                               ${
                                 active
-                                  ? "w-full"
-                                  : "w-0"
+                                  ? `
+                                      opacity-100
+                                    `
+                                  : `
+                                      opacity-45
+                                      hover:opacity-100
+                                    `
                               }
                             `}
-                          />
-                        </button>
-                      );
-                    })}
+                          >
+                            <Image
+                              src={image}
+                              alt=""
+                              fill
+                              sizes="64px"
+                              className="
+                                object-cover
+                                object-center
+
+                                transition-transform
+                                duration-500
+
+                                group-hover/thumb:scale-[1.05]
+                              "
+                            />
+
+                            <span
+                              className={`
+                                absolute
+                                bottom-0
+                                left-0
+
+                                h-[2px]
+
+                                bg-[var(--ares-dark-deep)]
+
+                                transition-all
+                                duration-500
+
+                                ${
+                                  active
+                                    ? "w-full"
+                                    : "w-0"
+                                }
+                              `}
+                            />
+                          </button>
+                        );
+                      }
+                    )}
                   </div>
                 )}
               </div>
 
-
-              {/* ===============================================
+              {/* ===========================================
                   MOBILE THUMBNAILS
-              ================================================ */}
+              ============================================ */}
 
               {gallery.length > 1 && (
                 <div
@@ -490,78 +582,85 @@ export default function ProductDetail({ product }) {
                     sm:hidden
                   "
                 >
-                  {gallery.map((image, index) => {
-                    const active =
-                      activeImage === image;
+                  {gallery.map(
+                    (image, index) => {
+                      const active =
+                        activeImage ===
+                        image;
 
-                    return (
-                      <button
-                        key={`mobile-${image}-${index}`}
-                        type="button"
-                        onClick={() =>
-                          setActiveImage(image)
-                        }
-                        aria-label={`${product.name} görsel ${
-                          index + 1
-                        }`}
-                        className={`
-                          relative
-
-                          h-[76px]
-                          w-[57px]
-
-                          flex-shrink-0
-
-                          overflow-hidden
-
-                          bg-[var(--ares-background-warm)]
-
-                          transition-opacity
-                          duration-300
-
-                          ${
-                            active
-                              ? "opacity-100"
-                              : "opacity-45"
+                      return (
+                        <button
+                          key={`mobile-${image}-${index}`}
+                          type="button"
+                          onClick={() =>
+                            setActiveImage(
+                              image
+                            )
                           }
-                        `}
-                      >
-                        <Image
-                          src={image}
-                          alt=""
-                          fill
-                          sizes="57px"
-                          className="
-                            object-cover
-                            object-center
-                          "
-                        />
+                          aria-label={`${
+                            product?.name ||
+                            "Ürün"
+                          } görsel ${
+                            index + 1
+                          }`}
+                          className={`
+                            relative
 
-                        {active && (
-                          <span
+                            h-[76px]
+                            w-[57px]
+
+                            flex-shrink-0
+
+                            overflow-hidden
+
+                            bg-[var(--ares-background-warm)]
+
+                            transition-opacity
+                            duration-300
+
+                            ${
+                              active
+                                ? "opacity-100"
+                                : "opacity-45"
+                            }
+                          `}
+                        >
+                          <Image
+                            src={image}
+                            alt=""
+                            fill
+                            sizes="57px"
                             className="
-                              absolute
-                              bottom-0
-                              left-0
-
-                              h-[2px]
-                              w-full
-
-                              bg-[var(--ares-dark-deep)]
+                              object-cover
+                              object-center
                             "
                           />
-                        )}
-                      </button>
-                    );
-                  })}
+
+                          {active && (
+                            <span
+                              className="
+                                absolute
+                                bottom-0
+                                left-0
+
+                                h-[2px]
+                                w-full
+
+                                bg-[var(--ares-dark-deep)]
+                              "
+                            />
+                          )}
+                        </button>
+                      );
+                    }
+                  )}
                 </div>
               )}
             </div>
 
-
-            {/* =================================================
+            {/* =============================================
                 RIGHT / PRODUCT INFORMATION
-            ================================================== */}
+            ============================================== */}
 
             <div
               className="
@@ -593,9 +692,17 @@ export default function ProductDetail({ product }) {
                   xl:max-w-[460px]
                 "
               >
-                {/* CATEGORY */}
+                {/* =========================================
+                    CATEGORY
+                ========================================== */}
 
-                <div className="flex items-center gap-3">
+                <div
+                  className="
+                    flex
+                    items-center
+                    gap-3
+                  "
+                >
                   <span
                     className="
                       h-px
@@ -618,14 +725,13 @@ export default function ProductDetail({ product }) {
                       xl:text-[8px]
                     "
                   >
-                    {product.category}
+                    {product?.category}
                   </p>
                 </div>
 
-
-                {/* =============================================
+                {/* =========================================
                     NAME + PRICE
-                ============================================== */}
+                ========================================== */}
 
                 <div
                   className="
@@ -663,12 +769,13 @@ export default function ProductDetail({ product }) {
                       lg:text-[clamp(2rem,2.6vw,2.8rem)]
                     "
                   >
-                    {product.name}
+                    {product?.name}
                   </h1>
 
                   <p
                     className="
                       flex-shrink-0
+
                       pb-[2px]
 
                       text-[11px]
@@ -679,14 +786,13 @@ export default function ProductDetail({ product }) {
                       xl:text-[12px]
                     "
                   >
-                    {product.formattedPrice}
+                    {product?.formattedPrice}
                   </p>
                 </div>
 
-
-                {/* =============================================
+                {/* =========================================
                     COLOR
-                ============================================== */}
+                ========================================== */}
 
                 <div
                   className="
@@ -728,7 +834,7 @@ export default function ProductDetail({ product }) {
                         xl:text-[10px]
                       "
                     >
-                      {product.color}
+                      {product?.color}
                     </p>
                   </div>
 
@@ -759,10 +865,9 @@ export default function ProductDetail({ product }) {
                   </div>
                 </div>
 
-
-                {/* =============================================
+                {/* =========================================
                     SIZE
-                ============================================== */}
+                ========================================== */}
 
                 <div
                   className="
@@ -824,7 +929,6 @@ export default function ProductDetail({ product }) {
                     </button>
                   </div>
 
-
                   {/* SIZE OPTIONS */}
 
                   <div
@@ -837,60 +941,68 @@ export default function ProductDetail({ product }) {
                       gap-2
                     "
                   >
-                    {product.sizes.map((size) => {
-                      const active =
-                        selectedSize === size;
+                    {productSizes.map(
+                      (size) => {
+                        const active =
+                          selectedSize ===
+                          size;
 
-                      return (
-                        <button
-                          key={size}
-                          type="button"
-                          onClick={() =>
-                            handleSizeSelect(size)
-                          }
-                          className={`
-                            flex
-                            h-9
-
-                            items-center
-                            justify-center
-
-                            border
-
-                            text-[9px]
-                            font-medium
-
-                            transition-all
-                            duration-300
-
-                            ${
-                              active
-                                ? `
-                                  border-[var(--ares-dark)]
-                                  bg-[var(--ares-dark)]
-                                  text-[var(--ares-background-soft)]
-                                `
-                                : `
-                                  border-[var(--ares-border)]
-                                  text-[var(--ares-muted)]
-
-                                  hover:border-[var(--ares-dark)]
-                                  hover:text-[var(--ares-dark-deep)]
-                                `
+                        return (
+                          <button
+                            key={size}
+                            type="button"
+                            onClick={() =>
+                              handleSizeSelect(
+                                size
+                              )
                             }
-                          `}
-                        >
-                          {size}
-                        </button>
-                      );
-                    })}
-                  </div>
+                            aria-pressed={
+                              active
+                            }
+                            className={`
+                              flex
+                              h-9
 
+                              items-center
+                              justify-center
+
+                              border
+
+                              text-[9px]
+                              font-medium
+
+                              transition-all
+                              duration-300
+
+                              ${
+                                active
+                                  ? `
+                                      border-[var(--ares-dark)]
+                                      bg-[var(--ares-dark)]
+                                      text-[var(--ares-background-soft)]
+                                    `
+                                  : `
+                                      border-[var(--ares-border)]
+                                      text-[var(--ares-muted)]
+
+                                      hover:border-[var(--ares-dark)]
+                                      hover:text-[var(--ares-dark-deep)]
+                                    `
+                              }
+                            `}
+                          >
+                            {size}
+                          </button>
+                        );
+                      }
+                    )}
+                  </div>
 
                   {/* SIZE ERROR */}
 
                   {sizeError && (
                     <p
+                      role="alert"
                       className="
                         mt-3
 
@@ -903,15 +1015,15 @@ export default function ProductDetail({ product }) {
                         text-[#9f3a38]
                       "
                     >
-                      Lütfen bir beden seçin.
+                      Lütfen bir beden
+                      seçin.
                     </p>
                   )}
                 </div>
 
-
-                {/* =============================================
+                {/* =========================================
                     QUANTITY
-                ============================================== */}
+                ========================================== */}
 
                 <div
                   className="
@@ -955,8 +1067,13 @@ export default function ProductDetail({ product }) {
                   >
                     <button
                       type="button"
-                      onClick={decreaseQuantity}
+                      onClick={
+                        decreaseQuantity
+                      }
                       aria-label="Adedi azalt"
+                      disabled={
+                        quantity <= 1
+                      }
                       className="
                         flex
                         h-full
@@ -971,6 +1088,9 @@ export default function ProductDetail({ product }) {
                         duration-300
 
                         hover:bg-[var(--ares-background-warm)]
+
+                        disabled:cursor-not-allowed
+                        disabled:opacity-30
                       "
                     >
                       <Minus
@@ -1003,7 +1123,9 @@ export default function ProductDetail({ product }) {
 
                     <button
                       type="button"
-                      onClick={increaseQuantity}
+                      onClick={
+                        increaseQuantity
+                      }
                       aria-label="Adedi artır"
                       className="
                         flex
@@ -1029,15 +1151,23 @@ export default function ProductDetail({ product }) {
                   </div>
                 </div>
 
-
-                {/* =============================================
+                {/* =========================================
                     CART + FAVORITE
-                ============================================== */}
+                ========================================== */}
 
-                <div className="mt-5 flex gap-2">
+                <div
+                  className="
+                    mt-5
+
+                    flex
+                    gap-2
+                  "
+                >
                   <button
                     type="button"
-                    onClick={handleAddToCart}
+                    onClick={
+                      handleAddToCart
+                    }
                     className="
                       ares-button
 
@@ -1060,20 +1190,21 @@ export default function ProductDetail({ product }) {
                     )}
                   </button>
 
-
                   {/* FAVORITE */}
 
                   <button
                     type="button"
-                    onClick={() =>
-                      toggleFavorite(product)
+                    onClick={
+                      handleFavorite
                     }
                     aria-label={
                       favorite
                         ? "Favorilerden çıkar"
                         : "Favorilere ekle"
                     }
-                    aria-pressed={favorite}
+                    aria-pressed={
+                      favorite
+                    }
                     className={`
                       flex
 
@@ -1094,15 +1225,15 @@ export default function ProductDetail({ product }) {
                       ${
                         favorite
                           ? `
-                            bg-[var(--ares-dark)]
-                            text-[var(--ares-background-soft)]
-                          `
+                              bg-[var(--ares-dark)]
+                              text-[var(--ares-background-soft)]
+                            `
                           : `
-                            text-[var(--ares-dark-deep)]
+                              text-[var(--ares-dark-deep)]
 
-                            hover:bg-[var(--ares-dark)]
-                            hover:text-[var(--ares-background-soft)]
-                          `
+                              hover:bg-[var(--ares-dark)]
+                              hover:text-[var(--ares-background-soft)]
+                            `
                       }
                     `}
                   >
@@ -1118,10 +1249,9 @@ export default function ProductDetail({ product }) {
                   </button>
                 </div>
 
-
-                {/* =============================================
+                {/* =========================================
                     SERVICE INFORMATION
-                ============================================== */}
+                ========================================== */}
 
                 <div
                   className="
@@ -1137,6 +1267,7 @@ export default function ProductDetail({ product }) {
                   <span
                     className="
                       text-[8px]
+
                       leading-[1.6]
 
                       text-[var(--ares-muted)]
@@ -1148,6 +1279,7 @@ export default function ProductDetail({ product }) {
                   <span
                     className="
                       text-[8px]
+
                       leading-[1.6]
 
                       text-[var(--ares-muted)]
@@ -1159,6 +1291,7 @@ export default function ProductDetail({ product }) {
                   <span
                     className="
                       text-[8px]
+
                       leading-[1.6]
 
                       text-[var(--ares-muted)]
@@ -1173,10 +1306,9 @@ export default function ProductDetail({ product }) {
         </div>
       </section>
 
-
-      {/* =====================================================
+      {/* ===================================================
           SIZE GUIDE
-      ====================================================== */}
+      ==================================================== */}
 
       <SizeGuide
         open={sizeGuideOpen}

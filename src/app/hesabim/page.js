@@ -7,14 +7,40 @@ export const metadata = {
   description: "ARES hesabınıza giriş yapın veya yeni bir hesap oluşturun.",
 };
 
-export default function HesabimPage() {
+/* =========================================================
+   ACCOUNT PAGE
+========================================================= */
+
+export default function Account() {
   return (
     <main>
+      {/* ===================================================
+          NAVBAR
+      ==================================================== */}
+
       <Navbar />
 
-      <div className="h-[108px] lg:h-[126px]" />
+      {/* ===================================================
+          FIXED NAVBAR OFFSET
+
+          Mobile:
+          Announcement 34px + Navbar 68px = 102px
+
+          Desktop:
+          Announcement 34px + Navbar 92px = 126px
+      ==================================================== */}
+
+      <div className="h-[102px] lg:h-[126px]" />
+
+      {/* ===================================================
+          ACCOUNT CONTENT
+      ==================================================== */}
 
       <AccountPage />
+
+      {/* ===================================================
+          FOOTER
+      ==================================================== */}
 
       <Footer />
     </main>

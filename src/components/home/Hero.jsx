@@ -7,8 +7,8 @@ export default function Hero() {
     <section
       className="
         relative
-        mt-[108px]
-        h-[calc(100dvh-108px)]
+        mt-[102px]
+        h-[calc(100dvh-102px)]
         w-full
         overflow-hidden
         bg-[var(--ares-dark)]
@@ -44,13 +44,13 @@ export default function Hero() {
 
       {/* =====================================================
           LEFT GRADIENT
-          Metnin okunabilirliğini artırır.
       ====================================================== */}
 
       <div
         className="
           absolute
           inset-0
+
           bg-gradient-to-r
           from-[#211a16]/75
           via-[#211a16]/30
@@ -61,7 +61,7 @@ export default function Hero() {
 
           lg:from-[#211a16]/72
           lg:via-[#211a16]/20
-      "
+        "
       />
 
       {/* =====================================================
@@ -72,6 +72,7 @@ export default function Hero() {
         className="
           absolute
           inset-0
+
           bg-gradient-to-t
           from-[#211a16]/35
           via-transparent
@@ -99,11 +100,8 @@ export default function Hero() {
           px-5
 
           sm:px-8
-
           lg:px-12
-
           xl:px-16
-
           2xl:px-20
         "
       >
@@ -115,7 +113,6 @@ export default function Hero() {
             text-[var(--ares-background-soft)]
 
             sm:max-w-[650px]
-
             lg:max-w-[680px]
           "
         >
@@ -132,7 +129,6 @@ export default function Hero() {
               gap-4
 
               sm:mb-6
-
               lg:mb-7
             "
           >
@@ -145,7 +141,6 @@ export default function Hero() {
                 bg-[var(--ares-gold)]
 
                 sm:w-10
-
                 lg:w-12
               "
             />
@@ -160,7 +155,6 @@ export default function Hero() {
                 text-white/85
 
                 sm:text-[9px]
-
                 lg:text-[10px]
               "
             >
@@ -174,12 +168,11 @@ export default function Hero() {
 
           <h1
             className="
-              font-editorial
-
               max-w-[580px]
 
-              text-[clamp(3.3rem,15vw,5.5rem)]
+              font-editorial
 
+              text-[clamp(3.3rem,15vw,5.5rem)]
               font-medium
 
               leading-[0.8]
@@ -251,7 +244,6 @@ export default function Hero() {
                 font-semibold
 
                 uppercase
-
                 tracking-[0.16em]
 
                 text-white
@@ -274,7 +266,6 @@ export default function Hero() {
                 strokeWidth={1.3}
                 className="
                   transition-transform
-
                   duration-500
 
                   ease-[cubic-bezier(0.22,1,0.36,1)]
@@ -308,13 +299,13 @@ export default function Hero() {
           lg:flex
 
           xl:right-16
-
           2xl:right-20
         "
       >
         <span
           className="
             text-[9px]
+
             uppercase
             tracking-[0.16em]
           "
@@ -327,6 +318,7 @@ export default function Hero() {
         <span
           className="
             text-[9px]
+
             uppercase
             tracking-[0.16em]
           "
