@@ -1,10 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import {
-  useEffect,
-  useState,
-} from "react";
+import { useEffect, useState } from "react";
 
 import {
   ArrowRight,
@@ -23,14 +20,9 @@ import {
 ========================================================= */
 
 export default function OrderSuccessPage() {
-  const [order, setOrder] =
-    useState(null);
-
-  const [isReady, setIsReady] =
-    useState(false);
-
-  const [copied, setCopied] =
-    useState(false);
+  const [order, setOrder] = useState(null);
+  const [isReady, setIsReady] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   /* =========================================================
      LOAD ORDER
@@ -39,17 +31,14 @@ export default function OrderSuccessPage() {
   useEffect(() => {
     try {
       const storedOrder =
-        sessionStorage.getItem(
-          "ares-last-order"
-        );
+        sessionStorage.getItem("ares-last-order");
 
       if (!storedOrder) {
         setIsReady(true);
         return;
       }
 
-      const parsedOrder =
-        JSON.parse(storedOrder);
+      const parsedOrder = JSON.parse(storedOrder);
 
       if (
         !parsedOrder ||
@@ -121,9 +110,10 @@ export default function OrderSuccessPage() {
     <section
       className="
         flex
-        min-h-[calc(100svh-108px)]
+        min-h-[calc(100svh-102px)]
         items-center
         bg-[var(--ares-background-soft)]
+
         lg:min-h-[calc(100svh-126px)]
       "
     >
@@ -137,15 +127,17 @@ export default function OrderSuccessPage() {
             flex-col
             items-center
             justify-center
+
             py-7
             text-center
+
             sm:py-9
             lg:py-7
           "
         >
-          {/* ===============================================
+          {/* =================================================
               SUCCESS ICON
-          ================================================ */}
+          ================================================== */}
 
           <div
             className="
@@ -158,6 +150,7 @@ export default function OrderSuccessPage() {
               rounded-full
               border
               border-[var(--ares-gold)]
+
               sm:h-14
               sm:w-14
             "
@@ -165,15 +158,13 @@ export default function OrderSuccessPage() {
             <Check
               size={19}
               strokeWidth={1.25}
-              className="
-                text-[var(--ares-gold)]
-              "
+              className="text-[var(--ares-gold)]"
             />
           </div>
 
-          {/* ===============================================
+          {/* =================================================
               EYEBROW
-          ================================================ */}
+          ================================================== */}
 
           <p
             className="
@@ -185,6 +176,7 @@ export default function OrderSuccessPage() {
               uppercase
               tracking-[0.2em]
               text-[var(--ares-muted)]
+
               sm:mt-6
               sm:text-[8px]
             "
@@ -192,9 +184,9 @@ export default function OrderSuccessPage() {
             ARES / Siparişiniz Alındı
           </p>
 
-          {/* ===============================================
+          {/* =================================================
               TITLE
-          ================================================ */}
+          ================================================== */}
 
           <h1
             className="
@@ -209,17 +201,19 @@ export default function OrderSuccessPage() {
               leading-[0.92]
               tracking-[-0.04em]
               text-[var(--ares-dark-deep)]
+
               sm:mt-4
               sm:text-[52px]
+
               lg:text-[58px]
             "
           >
             Teşekkür ederiz.
           </h1>
 
-          {/* ===============================================
+          {/* =================================================
               DESCRIPTION
-          ================================================ */}
+          ================================================== */}
 
           <p
             className="
@@ -231,18 +225,19 @@ export default function OrderSuccessPage() {
               text-[9px]
               leading-[1.8]
               text-[var(--ares-muted)]
+
               sm:text-[10px]
             "
           >
-            Siparişiniz başarıyla
-            alınmıştır. Hazırlık ve teslimat
-            sürecindeki gelişmeler sipariş
-            durumunuza yansıtılacaktır.
+            Siparişiniz başarıyla alınmıştır.
+            Hazırlık ve teslimat sürecindeki
+            gelişmeler sipariş durumunuza
+            yansıtılacaktır.
           </p>
 
-          {/* ===============================================
+          {/* =================================================
               ORDER NUMBER
-          ================================================ */}
+          ================================================== */}
 
           <div
             className="
@@ -254,6 +249,7 @@ export default function OrderSuccessPage() {
               border-[var(--ares-border)]
               py-4
               text-center
+
               sm:mt-7
             "
           >
@@ -278,6 +274,7 @@ export default function OrderSuccessPage() {
                 items-center
                 justify-center
                 gap-3
+
                 sm:flex-row
                 sm:gap-4
               "
@@ -297,9 +294,7 @@ export default function OrderSuccessPage() {
 
               <button
                 type="button"
-                onClick={
-                  handleCopyOrderNumber
-                }
+                onClick={handleCopyOrderNumber}
                 aria-label="Sipariş numarasını kopyala"
                 className="
                   group
@@ -310,16 +305,21 @@ export default function OrderSuccessPage() {
                   gap-2
                   px-3
                   py-1
+
                   text-[7px]
                   font-semibold
                   uppercase
                   tracking-[0.11em]
                   text-[var(--ares-muted)]
+
                   transition-colors
                   duration-300
+
                   hover:text-[var(--ares-dark-deep)]
+
                   focus:outline-none
                   focus-visible:outline-none
+
                   sm:border-l
                   sm:border-[var(--ares-border-dark)]
                 "
@@ -329,14 +329,10 @@ export default function OrderSuccessPage() {
                     <CheckCheck
                       size={12}
                       strokeWidth={1.4}
-                      className="
-                        text-[var(--ares-gold)]
-                      "
+                      className="text-[var(--ares-gold)]"
                     />
 
-                    <span>
-                      Kopyalandı
-                    </span>
+                    <span>Kopyalandı</span>
                   </>
                 ) : (
                   <>
@@ -350,9 +346,7 @@ export default function OrderSuccessPage() {
                       "
                     />
 
-                    <span>
-                      Kopyala
-                    </span>
+                    <span>Kopyala</span>
                   </>
                 )}
               </button>
@@ -391,6 +385,7 @@ export default function OrderSuccessPage() {
                   w-[3px]
                   rounded-full
                   bg-[var(--ares-border-dark)]
+
                   sm:block
                 "
               />
@@ -414,6 +409,7 @@ export default function OrderSuccessPage() {
                   w-[3px]
                   rounded-full
                   bg-[var(--ares-border-dark)]
+
                   sm:block
                 "
               />
@@ -433,9 +429,9 @@ export default function OrderSuccessPage() {
             </div>
           </div>
 
-          {/* ===============================================
+          {/* =================================================
               ORDER PROCESS
-          ================================================ */}
+          ================================================== */}
 
           <div
             className="
@@ -446,10 +442,13 @@ export default function OrderSuccessPage() {
               max-w-[720px]
               grid-cols-1
               gap-6
+
               border-b
               border-[var(--ares-border)]
+
               pb-7
               text-center
+
               sm:grid-cols-3
               sm:gap-0
             "
@@ -477,9 +476,9 @@ export default function OrderSuccessPage() {
             />
           </div>
 
-          {/* ===============================================
+          {/* =================================================
               SECURITY
-          ================================================ */}
+          ================================================== */}
 
           <div
             className="
@@ -498,9 +497,7 @@ export default function OrderSuccessPage() {
             <ShieldCheck
               size={14}
               strokeWidth={1.2}
-              className="
-                text-[var(--ares-gold)]
-              "
+              className="text-[var(--ares-gold)]"
             />
 
             <p
@@ -511,19 +508,19 @@ export default function OrderSuccessPage() {
                 text-[7px]
                 leading-[1.7]
                 text-[var(--ares-muted-light)]
+
                 sm:text-[8px]
               "
             >
-              Ödeme bilgileriniz güvenli
-              şekilde işlenir. Kart
-              bilgileriniz ARES tarafından
-              saklanmaz.
+              Ödeme bilgileriniz güvenli şekilde
+              işlenir. Kart bilgileriniz ARES
+              tarafından saklanmaz.
             </p>
           </div>
 
-          {/* ===============================================
+          {/* =================================================
               ACTIONS
-          ================================================ */}
+          ================================================== */}
 
           <div
             className="
@@ -536,6 +533,7 @@ export default function OrderSuccessPage() {
               justify-center
               gap-4
               text-center
+
               sm:flex-row
               sm:gap-6
             "
@@ -549,9 +547,7 @@ export default function OrderSuccessPage() {
                 justify-between
               "
             >
-              <span>
-                Koleksiyona Dön
-              </span>
+              <span>Koleksiyona Dön</span>
 
               <ArrowRight
                 size={14}
@@ -573,8 +569,10 @@ export default function OrderSuccessPage() {
                 uppercase
                 tracking-[0.12em]
                 text-[var(--ares-muted)]
+
                 transition-colors
                 duration-300
+
                 hover:text-[var(--ares-dark-deep)]
               "
             >
@@ -605,8 +603,10 @@ function ProcessItem({
         flex-col
         items-center
         justify-start
+
         px-5
         text-center
+
         sm:px-7
 
         ${
@@ -649,6 +649,7 @@ function ProcessItem({
           uppercase
           tracking-[0.14em]
           text-[var(--ares-dark-deep)]
+
           sm:text-[8px]
         "
       >
@@ -665,6 +666,7 @@ function ProcessItem({
           text-[7px]
           leading-[1.65]
           text-[var(--ares-muted)]
+
           sm:text-[8px]
         "
       >
@@ -683,10 +685,11 @@ function SuccessLoading() {
     <section
       className="
         flex
-        min-h-[calc(100svh-108px)]
+        min-h-[calc(100svh-102px)]
         items-center
         justify-center
         bg-[var(--ares-background-soft)]
+
         lg:min-h-[calc(100svh-126px)]
       "
     >
@@ -731,10 +734,11 @@ function InvalidSuccessState() {
     <section
       className="
         flex
-        min-h-[calc(100svh-108px)]
+        min-h-[calc(100svh-102px)]
         items-center
         justify-center
         bg-[var(--ares-background-soft)]
+
         lg:min-h-[calc(100svh-126px)]
       "
     >
@@ -745,6 +749,7 @@ function InvalidSuccessState() {
           max-w-[600px]
           flex-col
           items-center
+
           px-5
           text-center
         "
@@ -752,9 +757,7 @@ function InvalidSuccessState() {
         <ShoppingBag
           size={26}
           strokeWidth={1}
-          className="
-            text-[var(--ares-gold)]
-          "
+          className="text-[var(--ares-gold)]"
         />
 
         <p
@@ -779,6 +782,7 @@ function InvalidSuccessState() {
             leading-none
             tracking-[-0.035em]
             text-[var(--ares-dark-deep)]
+
             sm:text-[48px]
           "
         >
@@ -795,8 +799,8 @@ function InvalidSuccessState() {
             text-[var(--ares-muted)]
           "
         >
-          Bu sayfa tamamlanmış bir
-          siparişin ardından görüntülenebilir.
+          Bu sayfa tamamlanmış bir siparişin
+          ardından görüntülenebilir.
         </p>
 
         <Link
@@ -809,9 +813,7 @@ function InvalidSuccessState() {
             justify-between
           "
         >
-          <span>
-            Koleksiyonu Keşfet
-          </span>
+          <span>Koleksiyonu Keşfet</span>
 
           <ArrowRight
             size={14}

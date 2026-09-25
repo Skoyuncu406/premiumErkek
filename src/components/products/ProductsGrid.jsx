@@ -53,6 +53,21 @@ const sortOptions = [
 ];
 
 /* =========================================================
+   CATEGORY MAP
+
+   URL değerini ARES ürün kategorisine dönüştürür.
+   Böylece:
+   Tailoring / tailoring / TAILORING
+   aynı kategori olarak çalışır.
+========================================================= */
+
+const categoryMap = {
+  tailoring: "Tailoring",
+  outerwear: "Outerwear",
+  essentials: "Essentials",
+};
+
+/* =========================================================
    PRODUCTS GRID
 ========================================================= */
 
@@ -101,35 +116,46 @@ export default function ProductsGrid({
     const filterParam =
       searchParams.get("filter");
 
+    /*
+     * Ana URL standardımız:
+     *
+     * /urunler?kategori=Outerwear
+     *
+     * "category" desteğini de geriye dönük olarak
+     * koruyoruz. Böylece eski bir link kalmışsa
+     * filtre sistemi yine çalışır.
+     */
+
     const categoryParam =
-      searchParams.get("kategori");
+      searchParams.get("kategori") ||
+      searchParams.get("category");
+
+    const normalizedFilter =
+      filterParam
+        ?.trim()
+        .toLowerCase();
+
+    const normalizedCategory =
+      categoryParam
+        ?.trim()
+        .toLowerCase();
 
     let category = "Tümü";
 
     /* NEW ARRIVALS */
 
-    if (filterParam === "new") {
+    if (normalizedFilter === "new") {
       category = "Yeni Gelenler";
     }
 
     /* CATEGORY */
 
     if (
-      categoryParam === "tailoring"
+      normalizedCategory &&
+      categoryMap[normalizedCategory]
     ) {
-      category = "Tailoring";
-    }
-
-    if (
-      categoryParam === "outerwear"
-    ) {
-      category = "Outerwear";
-    }
-
-    if (
-      categoryParam === "essentials"
-    ) {
-      category = "Essentials";
+      category =
+        categoryMap[normalizedCategory];
     }
 
     /* APPLY */
@@ -164,7 +190,7 @@ export default function ProductsGrid({
       ) {
         result = result.filter(
           (product) =>
-            product?.isNew === true
+            product?.isNew === true,
         );
       } else if (
         filters.category !==
@@ -173,7 +199,7 @@ export default function ProductsGrid({
         result = result.filter(
           (product) =>
             product?.category ===
-            filters.category
+            filters.category,
         );
       }
 
@@ -188,7 +214,7 @@ export default function ProductsGrid({
           (product) => {
             const productSizes =
               Array.isArray(
-                product?.sizes
+                product?.sizes,
               )
                 ? product.sizes
                 : [];
@@ -196,10 +222,10 @@ export default function ProductsGrid({
             return filters.sizes.some(
               (size) =>
                 productSizes.includes(
-                  size
-                )
+                  size,
+                ),
             );
-          }
+          },
         );
       }
 
@@ -213,8 +239,8 @@ export default function ProductsGrid({
         result = result.filter(
           (product) =>
             filters.colors.includes(
-              product?.color
-            )
+              product?.color,
+            ),
         );
       }
 
@@ -230,14 +256,14 @@ export default function ProductsGrid({
           (product) => {
             const price =
               Number(
-                product?.price
+                product?.price,
               );
 
             return (
               price >= 0 &&
               price <= 5000
             );
-          }
+          },
         );
       }
 
@@ -249,14 +275,14 @@ export default function ProductsGrid({
           (product) => {
             const price =
               Number(
-                product?.price
+                product?.price,
               );
 
             return (
               price > 5000 &&
               price <= 10000
             );
-          }
+          },
         );
       }
 
@@ -267,8 +293,8 @@ export default function ProductsGrid({
         result = result.filter(
           (product) =>
             Number(
-              product?.price
-            ) > 10000
+              product?.price,
+            ) > 10000,
         );
       }
 
@@ -280,7 +306,7 @@ export default function ProductsGrid({
         result.sort(
           (a, b) =>
             Number(b?.isNew) -
-            Number(a?.isNew)
+            Number(a?.isNew),
         );
       }
 
@@ -290,7 +316,7 @@ export default function ProductsGrid({
         result.sort(
           (a, b) =>
             Number(a?.price) -
-            Number(b?.price)
+            Number(b?.price),
         );
       }
 
@@ -300,7 +326,7 @@ export default function ProductsGrid({
         result.sort(
           (a, b) =>
             Number(b?.price) -
-            Number(a?.price)
+            Number(a?.price),
         );
       }
 
@@ -316,7 +342,7 @@ export default function ProductsGrid({
   ======================================================== */
 
   function handleCategoryChange(
-    category
+    category,
   ) {
     setFilters((current) => ({
       ...current,
@@ -331,21 +357,21 @@ export default function ProductsGrid({
   ======================================================== */
 
   function handleSizeChange(
-    size
+    size,
   ) {
     if (!size) return;
 
     setFilters((current) => {
       const currentSizes =
         Array.isArray(
-          current?.sizes
+          current?.sizes,
         )
           ? current.sizes
           : [];
 
       const selected =
         currentSizes.includes(
-          size
+          size,
         );
 
       return {
@@ -354,7 +380,7 @@ export default function ProductsGrid({
         sizes: selected
           ? currentSizes.filter(
               (item) =>
-                item !== size
+                item !== size,
             )
           : [
               ...currentSizes,
@@ -369,21 +395,21 @@ export default function ProductsGrid({
   ======================================================== */
 
   function handleColorChange(
-    color
+    color,
   ) {
     if (!color) return;
 
     setFilters((current) => {
       const currentColors =
         Array.isArray(
-          current?.colors
+          current?.colors,
         )
           ? current.colors
           : [];
 
       const selected =
         currentColors.includes(
-          color
+          color,
         );
 
       return {
@@ -392,7 +418,7 @@ export default function ProductsGrid({
         colors: selected
           ? currentColors.filter(
               (item) =>
-                item !== color
+                item !== color,
             )
           : [
               ...currentColors,
@@ -407,7 +433,7 @@ export default function ProductsGrid({
   ======================================================== */
 
   function handlePriceChange(
-    price
+    price,
   ) {
     if (!price) return;
 
@@ -453,7 +479,7 @@ export default function ProductsGrid({
   const currentSort =
     sortOptions.find(
       (option) =>
-        option.id === sort
+        option.id === sort,
     ) || sortOptions[0];
 
   /* =======================================================
@@ -465,7 +491,6 @@ export default function ProductsGrid({
       <section
         className="
           w-full
-
           bg-[var(--ares-background-soft)]
         "
       >
@@ -474,13 +499,10 @@ export default function ProductsGrid({
             className="
               grid
               gap-8
-
               py-8
-
               lg:grid-cols-12
               lg:gap-10
               lg:py-12
-
               xl:gap-12
             "
           >
@@ -514,7 +536,6 @@ export default function ProductsGrid({
             <div
               className="
                 min-w-0
-
                 lg:col-span-9
                 xl:col-span-10
               "
@@ -529,16 +550,12 @@ export default function ProductsGrid({
                 className="
                   relative
                   z-40
-
                   flex
                   items-center
                   justify-between
-
                   gap-4
-
                   border-b
                   border-[var(--ares-border)]
-
                   pb-5
                 "
               >
@@ -548,12 +565,9 @@ export default function ProductsGrid({
                   className="
                     text-[8px]
                     font-semibold
-
                     uppercase
                     tracking-[0.15em]
-
                     text-[var(--ares-muted)]
-
                     sm:text-[9px]
                   "
                 >
@@ -569,7 +583,6 @@ export default function ProductsGrid({
                   className="
                     flex
                     items-center
-
                     gap-5
                   "
                 >
@@ -581,23 +594,18 @@ export default function ProductsGrid({
                     type="button"
                     onClick={() =>
                       setMobileFiltersOpen(
-                        true
+                        true,
                       )
                     }
                     className="
                       flex
                       items-center
-
                       gap-2
-
                       text-[8px]
                       font-semibold
-
                       uppercase
                       tracking-[0.14em]
-
                       text-[var(--ares-dark-deep)]
-
                       lg:hidden
                     "
                   >
@@ -615,19 +623,13 @@ export default function ProductsGrid({
                       <span
                         className="
                           flex
-
                           h-[16px]
                           min-w-[16px]
-
                           items-center
                           justify-center
-
                           rounded-full
-
                           bg-[var(--ares-dark)]
-
                           px-1
-
                           text-[7px]
                           text-white
                         "
@@ -658,25 +660,19 @@ export default function ProductsGrid({
                       onClick={() =>
                         setSortOpen(
                           (current) =>
-                            !current
+                            !current,
                         )
                       }
                       className="
                         group
-
                         flex
                         items-center
-
                         gap-2
-
                         text-[8px]
                         font-semibold
-
                         uppercase
                         tracking-[0.14em]
-
                         text-[var(--ares-dark-deep)]
-
                         sm:text-[9px]
                       "
                     >
@@ -720,23 +716,15 @@ export default function ProductsGrid({
                       aria-label="Ürünleri sırala"
                       className={`
                         absolute
-
                         right-0
                         top-[calc(100%+16px)]
-
                         z-[100]
-
                         w-[190px]
-
                         overflow-hidden
-
                         border
                         border-[var(--ares-border)]
-
                         bg-[var(--ares-background-soft)]
-
                         shadow-[0_18px_45px_rgba(33,26,22,0.08)]
-
                         transition-all
                         duration-300
 
@@ -773,34 +761,26 @@ export default function ProductsGrid({
                               }
                               onClick={() => {
                                 setSort(
-                                  option.id
+                                  option.id,
                                 );
 
                                 setSortOpen(
-                                  false
+                                  false,
                                 );
                               }}
                               className={`
                                 flex
-
                                 min-h-[44px]
                                 w-full
-
                                 items-center
                                 justify-between
-
                                 border-b
                                 border-[var(--ares-border)]/60
-
                                 px-4
-
                                 text-left
-
                                 transition-colors
                                 duration-300
-
                                 last:border-b-0
-
                                 hover:bg-[var(--ares-background-warm)]
 
                                 ${
@@ -834,18 +814,15 @@ export default function ProductsGrid({
                                   className="
                                     h-[4px]
                                     w-[4px]
-
                                     flex-shrink-0
-
                                     rounded-full
-
                                     bg-[var(--ares-gold)]
                                   "
                                 />
                               )}
                             </button>
                           );
-                        }
+                        },
                       )}
                     </div>
                   </div>
@@ -862,17 +839,12 @@ export default function ProductsGrid({
                   className="
                     relative
                     z-10
-
                     flex
                     flex-wrap
-
                     items-center
-
                     gap-2
-
                     border-b
                     border-[var(--ares-border)]
-
                     py-4
                   "
                 >
@@ -886,7 +858,7 @@ export default function ProductsGrid({
                       }
                       onRemove={() =>
                         handleCategoryChange(
-                          "Tümü"
+                          "Tümü",
                         )
                       }
                     />
@@ -901,11 +873,11 @@ export default function ProductsGrid({
                         label={`Beden ${size}`}
                         onRemove={() =>
                           handleSizeChange(
-                            size
+                            size,
                           )
                         }
                       />
-                    )
+                    ),
                   )}
 
                   {/* COLORS */}
@@ -917,11 +889,11 @@ export default function ProductsGrid({
                         label={color}
                         onRemove={() =>
                           handleColorChange(
-                            color
+                            color,
                           )
                         }
                       />
-                    )
+                    ),
                   )}
 
                   {/* PRICE */}
@@ -929,11 +901,11 @@ export default function ProductsGrid({
                   {filters.price && (
                     <FilterTag
                       label={getPriceLabel(
-                        filters.price
+                        filters.price,
                       )}
                       onRemove={() =>
                         handlePriceChange(
-                          filters.price
+                          filters.price,
                         )
                       }
                     />
@@ -948,18 +920,13 @@ export default function ProductsGrid({
                     }
                     className="
                       ml-2
-
                       text-[8px]
                       font-semibold
-
                       uppercase
                       tracking-[0.12em]
-
                       text-[var(--ares-muted)]
-
                       transition-colors
                       duration-300
-
                       hover:text-[var(--ares-dark-deep)]
                     "
                   >
@@ -980,27 +947,19 @@ export default function ProductsGrid({
                   className="
                     relative
                     z-0
-
                     grid
                     grid-cols-2
-
                     gap-x-3
                     gap-y-10
-
                     pt-6
-
                     sm:gap-x-5
                     sm:gap-y-12
-
                     md:grid-cols-3
                     md:gap-x-6
-
                     lg:pt-8
-
                     xl:grid-cols-4
                     xl:gap-x-5
                     xl:gap-y-14
-
                     2xl:gap-x-7
                   "
                 >
@@ -1014,7 +973,7 @@ export default function ProductsGrid({
                           product
                         }
                       />
-                    )
+                    ),
                   )}
                 </div>
               ) : (
@@ -1034,17 +993,12 @@ export default function ProductsGrid({
                 <div
                   className="
                     mt-14
-
                     flex
                     flex-col
-
                     items-center
-
                     border-t
                     border-[var(--ares-border)]
-
                     pt-10
-
                     lg:mt-20
                     lg:pt-12
                   "
@@ -1052,10 +1006,8 @@ export default function ProductsGrid({
                   <p
                     className="
                       text-[8px]
-
                       uppercase
                       tracking-[0.14em]
-
                       text-[var(--ares-muted)]
                     "
                   >
@@ -1068,10 +1020,8 @@ export default function ProductsGrid({
                   <span
                     className="
                       mt-4
-
                       h-px
                       w-10
-
                       bg-[var(--ares-gold)]
                     "
                   />
@@ -1090,7 +1040,7 @@ export default function ProductsGrid({
         open={mobileFiltersOpen}
         onClose={() =>
           setMobileFiltersOpen(
-            false
+            false,
           )
         }
         filters={filters}
@@ -1131,30 +1081,20 @@ function FilterTag({
       onClick={onRemove}
       className="
         group
-
         inline-flex
         min-h-[30px]
-
         items-center
-
         gap-2
-
         border
         border-[var(--ares-border)]
-
         px-3
-
         text-[8px]
         font-medium
-
         uppercase
         tracking-[0.08em]
-
         text-[var(--ares-muted)]
-
         transition-colors
         duration-300
-
         hover:border-[var(--ares-dark)]
         hover:text-[var(--ares-dark-deep)]
       "
@@ -1183,17 +1123,12 @@ function EmptyState({
       className="
         flex
         min-h-[460px]
-
         flex-col
-
         items-center
         justify-center
-
         border-b
         border-[var(--ares-border)]
-
         px-5
-
         text-center
       "
     >
@@ -1201,10 +1136,8 @@ function EmptyState({
         className="
           text-[8px]
           font-semibold
-
           uppercase
           tracking-[0.18em]
-
           text-[var(--ares-muted)]
         "
       >
@@ -1214,18 +1147,12 @@ function EmptyState({
       <h3
         className="
           mt-5
-
           font-editorial
-
           text-[38px]
           font-medium
-
           leading-none
-
           tracking-[-0.03em]
-
           text-[var(--ares-dark-deep)]
-
           sm:text-[48px]
         "
       >
@@ -1237,15 +1164,10 @@ function EmptyState({
       <p
         className="
           mt-5
-
           max-w-[330px]
-
           text-[10px]
-
           leading-[1.8]
-
           text-[var(--ares-muted)]
-
           sm:text-[11px]
         "
       >
@@ -1260,7 +1182,6 @@ function EmptyState({
         className="
           ares-button
           ares-button-outline
-
           mt-7
         "
       >

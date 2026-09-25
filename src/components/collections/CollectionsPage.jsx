@@ -25,7 +25,7 @@ const collections = [
     image:
       "/images/categories/tailoring.jpg",
     href:
-      "/urunler?category=Tailoring",
+      "/urunler?kategori=Tailoring",
   },
 
   {
@@ -40,7 +40,7 @@ const collections = [
     image:
       "/images/categories/outerwear.jpg",
     href:
-      "/urunler?category=Outerwear",
+      "/urunler?kategori=Outerwear",
   },
 
   {
@@ -55,7 +55,7 @@ const collections = [
     image:
       "/images/categories/essentials.jpg",
     href:
-      "/urunler?category=Essentials",
+      "/urunler?kategori=Essentials",
   },
 ];
 
@@ -90,19 +90,17 @@ export default function CollectionsPage() {
         >
           {/* EYEBROW */}
 
-      
-            <p
-              className="
-                text-[8px]
-                font-semibold
-                uppercase
-                tracking-[0.18em]
-                text-[var(--ares-muted)]
-              "
-            >
-              ARES / Collections
-            </p>
-          
+          <p
+            className="
+              text-[8px]
+              font-semibold
+              uppercase
+              tracking-[0.18em]
+              text-[var(--ares-muted)]
+            "
+          >
+            ARES / Collections
+          </p>
         </div>
       </div>
 
@@ -126,7 +124,7 @@ export default function CollectionsPage() {
                 index % 2 === 1
               }
             />
-          )
+          ),
         )}
       </div>
 
@@ -270,7 +268,6 @@ function CollectionRow({
             h-full
             items-center
             justify-center
-
             ${
               reverse
                 ? "lg:order-2"
@@ -306,11 +303,10 @@ function CollectionRow({
                 src={collection.image}
                 alt={collection.title}
                 fill
-                priority={collection.number === "01"}
-                sizes="
-                  (max-width: 1023px) 100vw,
-                  50vw
-                "
+                priority={
+                  collection.number === "01"
+                }
+                sizes="(max-width: 1023px) 100vw, 50vw"
                 className="
                   object-cover
                   transition-transform
@@ -374,7 +370,6 @@ function CollectionRow({
             flex
             h-full
             items-center
-
             ${
               reverse
                 ? "lg:order-1"
