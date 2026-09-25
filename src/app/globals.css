@@ -684,18 +684,28 @@ p {
 ========================================================= */
 
 .ares-footer-email {
-  border: 0;
+  width: 100%;
 
+  border: 0;
   border-radius: 0;
 
   outline: none;
+  outline-offset: 0;
 
   box-shadow: none;
 
   -webkit-appearance: none;
   appearance: none;
-}
 
+  background-color: transparent !important;
+  background-image: none !important;
+
+  color: inherit;
+
+  transition:
+    color var(--ares-transition),
+    border-color var(--ares-transition);
+}
 .ares-footer-email:focus,
 .ares-footer-email:focus-visible,
 .ares-footer-email:active {
