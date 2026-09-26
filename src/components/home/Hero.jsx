@@ -1,57 +1,265 @@
+"use client";
+
+import { useLayoutEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+gsap.registerPlugin(ScrollTrigger);
+
 export default function Hero() {
+  const heroRef = useRef(null);
+  const imageRef = useRef(null);
+
+  useLayoutEffect(() => {
+    const hero = heroRef.current;
+    const image = imageRef.current;
+
+    if (!hero || !image) return;
+
+    const ctx = gsap.context(() => {
+      const mm = gsap.matchMedia();
+
+      /* =====================================================
+         DESKTOP
+         -----------------------------------------------------
+         - Hero koyu kahve olarak açılır
+         - Metinler her zaman görünür
+         - Scroll sırasında Hero pinlenir
+         - Sadece arka plan fotoğrafı görünür hale gelir
+         - Fotoğraf tamamen görününce normal scroll devam eder
+      ====================================================== */
+
+      mm.add("(min-width: 1024px)", () => {
+        gsap.set(image, {
+          opacity: 0,
+        });
+
+        const reveal = gsap.to(image, {
+          opacity: 1,
+
+          ease: "none",
+
+          scrollTrigger: {
+            trigger: hero,
+
+            /*
+              Desktop navbar toplam yüksekliği:
+              34px announcement
+              92px navbar
+              = 126px
+            */
+            start: "top top+=126",
+
+            /*
+              Desktop reveal mesafesi
+            */
+            end: "+=80%",
+
+            /*
+              Scroll hareketini doğrudan animasyona bağlar
+            */
+            scrub: true,
+
+            /*
+              Reveal tamamlanana kadar Hero sabit kalır
+            */
+            pin: true,
+
+            /*
+              Hero bittikten sonra aşağıdaki içeriğin
+              doğal akışını korur
+            */
+            pinSpacing: true,
+
+            anticipatePin: 1,
+
+            invalidateOnRefresh: true,
+          },
+        });
+
+        return () => {
+          reveal.scrollTrigger?.kill();
+          reveal.kill();
+        };
+      });
+
+      /* =====================================================
+         MOBILE / TABLET
+         -----------------------------------------------------
+         Aynı konsept korunuyor.
+
+         Fark:
+         - Daha kısa scroll mesafesi
+         - Daha yumuşak scrub
+         - Mobil kullanıcı uzun süre Hero'da tutulmuyor
+      ====================================================== */
+
+      mm.add("(max-width: 1023px)", () => {
+        gsap.set(image, {
+          opacity: 0,
+        });
+
+        const reveal = gsap.to(image, {
+          opacity: 1,
+
+          ease: "none",
+
+          scrollTrigger: {
+            trigger: hero,
+
+            /*
+              Mobile navbar toplam yüksekliği:
+              34px announcement
+              68px navbar
+              = 102px
+            */
+            start: "top top+=102",
+
+            /*
+              Mobilde reveal daha kısa
+            */
+            end: "+=55%",
+
+            /*
+              Parmak hareketini biraz yumuşatır
+            */
+            scrub: 0.7,
+
+            /*
+              Fotoğraf tamamen görünene kadar
+              Hero sabit kalır
+            */
+            pin: true,
+
+            pinSpacing: true,
+
+            anticipatePin: 1,
+
+            invalidateOnRefresh: true,
+          },
+        });
+
+        return () => {
+          reveal.scrollTrigger?.kill();
+          reveal.kill();
+        };
+      });
+
+      /* =====================================================
+         SCROLLTRIGGER REFRESH
+      ====================================================== */
+
+      requestAnimationFrame(() => {
+        ScrollTrigger.refresh();
+      });
+
+      return () => {
+        mm.revert();
+      };
+    }, hero);
+
+    return () => {
+      ctx.revert();
+    };
+  }, []);
+
   return (
     <section
+      ref={heroRef}
       className="
         relative
+
         mt-[102px]
         h-[calc(100dvh-102px)]
         w-full
+
         overflow-hidden
-        bg-[var(--ares-dark)]
+
+        bg-[#211A16]
 
         lg:mt-[126px]
         lg:h-[calc(100dvh-126px)]
       "
     >
       {/* =====================================================
-          HERO IMAGE
+          BACKGROUND IMAGE
+          -----------------------------------------------------
+          GSAP sadece bu katmanın opacity değerini değiştirir.
+
+          opacity:
+          0 → 1
+
+          Görselde:
+          - zoom yok
+          - scale yok
+          - translate yok
+          - parallax yok
       ====================================================== */}
 
-      <Image
-        src="/images/hero/ares-hero.jpg"
-        alt="ARES premium erkek giyim koleksiyonu"
-        fill
-        priority
-        sizes="100vw"
-        className="ares-hero-image"
-      />
+      <div
+        ref={imageRef}
+        className="
+          absolute
+          inset-0
+          z-0
+
+          opacity-0
+
+          will-change-[opacity]
+        "
+      >
+        <Image
+          src="/images/hero/ares-hero.jpg"
+          alt="ARES premium erkek giyim koleksiyonu"
+          fill
+          priority
+          sizes="100vw"
+          className="ares-hero-image"
+        />
+      </div>
 
       {/* =====================================================
           BASE OVERLAY
+          -----------------------------------------------------
+          Fotoğraf ortaya çıktığında metinlerin
+          okunabilirliğini korur.
+
+          Animasyona dahil değildir.
       ====================================================== */}
 
       <div
         className="
+          pointer-events-none
+
           absolute
           inset-0
+          z-[1]
+
           bg-black/10
         "
       />
 
       {/* =====================================================
-          LEFT GRADIENT
+          DESKTOP / GENERAL GRADIENT
+          -----------------------------------------------------
+          Statik katman.
+          Scroll sırasında değişmez.
       ====================================================== */}
 
       <div
         className="
+          pointer-events-none
+
           absolute
           inset-0
+          z-[2]
 
           bg-gradient-to-r
+
           from-[#211a16]/75
           via-[#211a16]/30
           to-transparent
@@ -66,14 +274,23 @@ export default function Hero() {
 
       {/* =====================================================
           MOBILE OVERLAY
+          -----------------------------------------------------
+          Mobilde fotoğraf üzerinde metin okunabilirliğini
+          artırır.
+
+          Animasyona dahil değildir.
       ====================================================== */}
 
       <div
         className="
+          pointer-events-none
+
           absolute
           inset-0
+          z-[3]
 
           bg-gradient-to-t
+
           from-[#211a16]/35
           via-transparent
           to-[#211a16]/10
@@ -84,6 +301,19 @@ export default function Hero() {
 
       {/* =====================================================
           HERO CONTENT
+          -----------------------------------------------------
+          ÖNEMLİ:
+
+          Bu container GSAP tarafından kontrol edilmiyor.
+
+          Dolayısıyla scroll sırasında:
+          - opacity değişmez
+          - position değişmez
+          - translate uygulanmaz
+          - scale uygulanmaz
+          - rotate uygulanmaz
+
+          Bütün içerik aynı yerde kalır.
       ====================================================== */}
 
       <div
@@ -136,6 +366,7 @@ export default function Hero() {
               className="
                 h-px
                 w-8
+
                 flex-shrink-0
 
                 bg-[var(--ares-gold)]
@@ -281,16 +512,21 @@ export default function Hero() {
 
       {/* =====================================================
           DESKTOP BOTTOM INFORMATION
+          -----------------------------------------------------
+          Statik kalır.
+          Scroll animasyonundan etkilenmez.
       ====================================================== */}
 
       <div
         className="
           absolute
+
           bottom-8
           right-12
           z-10
 
           hidden
+
           items-center
           gap-5
 
