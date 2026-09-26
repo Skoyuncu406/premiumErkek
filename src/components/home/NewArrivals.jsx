@@ -1,226 +1,341 @@
 "use client";
 
+import { useLayoutEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight, Heart } from "lucide-react";
 
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+import { products } from "@/data/products";
 import useShopStore from "@/store/useShopStore";
 
-/* =========================================================
-   PRODUCTS
-========================================================= */
-
-const products = [
-  {
-    id: 1,
-    name: "Wool Blend Overshirt",
-    category: "Outerwear",
-    color: "Kahverengi",
-    price: "₺6.490",
-    image: "/images/products/product-01.jpg",
-    href: "/urunler/wool-blend-overshirt",
-    isNew: true,
-  },
-  {
-    id: 2,
-    name: "Tailored Wool Trousers",
-    category: "Tailoring",
-    color: "Kum",
-    price: "₺4.890",
-    image: "/images/products/product-02.jpg",
-    href: "/urunler/tailored-wool-trousers",
-    isNew: true,
-  },
-  {
-    id: 3,
-    name: "Merino Polo Knit",
-    category: "Essentials",
-    color: "Ekru",
-    price: "₺3.990",
-    image: "/images/products/product-03.jpg",
-    href: "/urunler/merino-polo-knit",
-    isNew: true,
-  },
-  {
-    id: 4,
-    name: "Structured Blazer",
-    category: "Tailoring",
-    color: "Antrasit",
-    price: "₺8.990",
-    image: "/images/products/product-04.jpg",
-    href: "/urunler/structured-blazer",
-    isNew: true,
-  },
-];
+gsap.registerPlugin(ScrollTrigger);
 
 /* =========================================================
    NEW ARRIVALS
 ========================================================= */
 
 export default function NewArrivals() {
+  const sectionRef = useRef(null);
+
+  /* ---------------------------------------------------------
+     FEATURED PRODUCTS
+  --------------------------------------------------------- */
+
+  const newProducts = products.filter((product) => product.isNew);
+
+  const featuredProducts =
+    newProducts.length >= 4 ? newProducts.slice(0, 4) : products.slice(0, 4);
+
+  /* =========================================================
+     GSAP / SCROLLTRIGGER
+  ========================================================= */
+
+  useLayoutEffect(() => {
+    const section = sectionRef.current;
+
+    if (!section) return;
+
+    const ctx = gsap.context(() => {
+      const images = gsap.utils.toArray(
+        "[data-new-arrival-image]",
+        section,
+      );
+
+      if (!images.length) return;
+
+      const mm = gsap.matchMedia();
+
+      /* =====================================================
+         REDUCED MOTION
+      ====================================================== */
+
+      mm.add("(prefers-reduced-motion: reduce)", () => {
+        gsap.set(images, {
+          opacity: 1,
+          scale: 1,
+          y: 0,
+        });
+      });
+
+      /* =====================================================
+         DESKTOP ANIMATION
+      ====================================================== */
+
+      mm.add(
+        "(min-width: 1024px) and (prefers-reduced-motion: no-preference)",
+        () => {
+          const animations = images.map((image, index) => {
+            return gsap.fromTo(
+              image,
+              {
+                opacity: 0.42,
+
+                scale: 1.06,
+
+                y: 26,
+              },
+              {
+                opacity: 1,
+
+                scale: 1,
+
+                y: 0,
+
+                ease: "none",
+
+                scrollTrigger: {
+                  trigger: image,
+
+                  /*
+                    Her ürün çok küçük bir farkla
+                    reveal olmaya başlar.
+                  */
+
+                  start: `top ${88 - index * 2}%`,
+
+                  end: `top ${55 - index * 2}%`,
+
+                  scrub: 0.8,
+
+                  invalidateOnRefresh: true,
+                },
+              },
+            );
+          });
+
+          return () => {
+            animations.forEach((animation) => {
+              animation.scrollTrigger?.kill();
+              animation.kill();
+            });
+          };
+        },
+      );
+
+      /* =====================================================
+         MOBILE / TABLET ANIMATION
+      ====================================================== */
+
+      mm.add(
+        "(max-width: 1023px) and (prefers-reduced-motion: no-preference)",
+        () => {
+          const animations = images.map((image) => {
+            return gsap.fromTo(
+              image,
+              {
+                opacity: 0.55,
+
+                scale: 1.035,
+
+                y: 16,
+              },
+              {
+                opacity: 1,
+
+                scale: 1,
+
+                y: 0,
+
+                ease: "none",
+
+                scrollTrigger: {
+                  trigger: image,
+
+                  start: "top 92%",
+
+                  end: "top 68%",
+
+                  scrub: 0.55,
+
+                  invalidateOnRefresh: true,
+                },
+              },
+            );
+          });
+
+          return () => {
+            animations.forEach((animation) => {
+              animation.scrollTrigger?.kill();
+              animation.kill();
+            });
+          };
+        },
+      );
+
+      /* =====================================================
+         REFRESH
+      ====================================================== */
+
+      requestAnimationFrame(() => {
+        ScrollTrigger.refresh();
+      });
+
+      return () => {
+        mm.revert();
+      };
+    }, section);
+
+    return () => {
+      ctx.revert();
+    };
+  }, []);
+
+  /* =========================================================
+     JSX
+  ========================================================= */
+
   return (
     <section
+      ref={sectionRef}
       className="
+        relative
         w-full
-        bg-[var(--ares-background-soft)]
+
+        bg-[var(--ares-background)]
+
+        px-5
+        py-16
+
+        sm:px-8
+        sm:py-20
+
+        lg:min-h-screen
+        lg:px-12
+        lg:py-24
+
+        xl:px-16
+
+        2xl:px-20
       "
     >
-      <div className="ares-container-wide">
-        {/* =====================================================
-            DESKTOP / TABLET FULL VIEWPORT AREA
-        ====================================================== */}
+      <div
+        className="
+          mx-auto
+          w-full
+          max-w-[1680px]
+        "
+      >
+        {/* ===================================================
+            SECTION HEADER
+        ==================================================== */}
 
         <div
           className="
+            mb-10
+
             flex
-            min-h-[calc(100dvh-108px)]
-            flex-col
+            items-end
+            justify-between
 
-            py-8
+            gap-6
 
-            lg:h-[calc(100dvh-126px)]
-            lg:min-h-[650px]
-            lg:py-8
+            sm:mb-12
 
-            xl:py-10
+            lg:mb-14
           "
         >
-          {/* ===================================================
-              COMPACT HEADER
-          ==================================================== */}
+          {/* =================================================
+              TITLE
+          ================================================== */}
 
-          <div
-            className="
-              grid
-              flex-shrink-0
-              gap-5
-
-              border-b
-              border-[var(--ares-border)]
-
-              pb-7
-
-              md:grid-cols-12
-              md:items-end
-
-              lg:gap-8
-              lg:pb-8
-            "
-          >
-            {/* LABEL */}
-
-            <div className="md:col-span-3">
-              <div className="flex items-center gap-4">
-                <span
-                  className="
-                    h-px
-                    w-8
-                    flex-shrink-0
-                    bg-[var(--ares-gold)]
-                  "
-                />
-
-                <span
-                  className="
-                    text-[8px]
-                    font-semibold
-                    uppercase
-                    tracking-[0.18em]
-                    text-[var(--ares-muted)]
-                    sm:text-[9px]
-                  "
-                >
-                  ARES / New Season
-                </span>
-              </div>
-            </div>
-
-            {/* HEADING */}
-
-            <div className="md:col-span-6">
-              <h2
-                className="
-                  font-editorial
-                  text-[clamp(2.8rem,5vw,5.2rem)]
-                  font-medium
-                  leading-[0.84]
-                  tracking-[-0.04em]
-                  text-[var(--ares-dark-deep)]
-                "
-              >
-                New Arrivals.
-              </h2>
-            </div>
-
-            {/* DESKTOP ALL PRODUCTS */}
-
-            <div
+          <div>
+            <p
               className="
-                hidden
-                md:col-span-3
-                md:flex
-                md:justify-end
+                ares-eyebrow
+
+                mb-3
+
+                text-[9px]
+
+                uppercase
+                tracking-[0.18em]
+
+                text-[var(--ares-muted)]
+
+                sm:text-[10px]
               "
             >
-              <AllProductsLink />
-            </div>
-          </div>
+              ARES / Selection
+            </p>
 
-          {/* ===================================================
-              PRODUCT GRID
-          ==================================================== */}
+            <h2
+              className="
+                font-editorial
 
-          <div
-            className="
-              grid
-              grid-cols-2
+                text-[clamp(2.6rem,8vw,4.5rem)]
+                font-medium
 
-              gap-x-3
-              gap-y-10
+                leading-[0.9]
 
-              pt-7
+                tracking-[-0.035em]
 
-              sm:gap-x-5
+                text-[var(--ares-dark)]
 
-              md:gap-x-6
-
-              lg:min-h-0
-              lg:flex-1
-              lg:grid-cols-4
-              lg:gap-x-5
-              lg:gap-y-0
-              lg:pt-8
-
-              xl:gap-x-7
-            "
-          >
-            {products.map((product) => (
-              <ProductItem
-                key={product.id}
-                product={product}
-              />
-            ))}
-          </div>
-
-          {/* ===================================================
-              MOBILE ALL PRODUCTS
-          ==================================================== */}
-
-          <div
-            className="
-              mt-10
-              flex
-              justify-center
-              md:hidden
-            "
-          >
-            <Link
-              href="/urunler?filter=new"
-              className="ares-button ares-button-outline"
+                lg:text-[clamp(3.5rem,5vw,5.5rem)]
+              "
             >
-              Tüm Yeni Ürünler
-            </Link>
+              New Arrivals
+            </h2>
           </div>
+
+          {/* =================================================
+              DESKTOP ALL PRODUCTS
+          ================================================== */}
+
+          <div className="hidden sm:block">
+            <AllProductsLink />
+          </div>
+        </div>
+
+        {/* ===================================================
+            PRODUCTS GRID
+        ==================================================== */}
+
+        <div
+          className="
+            grid
+
+            grid-cols-2
+
+            gap-x-3
+            gap-y-10
+
+            sm:gap-x-5
+            sm:gap-y-12
+
+            lg:grid-cols-4
+            lg:gap-x-5
+            lg:gap-y-0
+
+            xl:gap-x-6
+          "
+        >
+          {featuredProducts.map((product) => (
+            <ProductItem
+              key={product.id}
+              product={product}
+            />
+          ))}
+        </div>
+
+        {/* ===================================================
+            MOBILE ALL PRODUCTS
+        ==================================================== */}
+
+        <div
+          className="
+            mt-12
+
+            flex
+            justify-center
+
+            sm:hidden
+          "
+        >
+          <AllProductsLink />
         </div>
       </div>
     </section>
@@ -232,50 +347,52 @@ export default function NewArrivals() {
 ========================================================= */
 
 function ProductItem({ product }) {
-  /* =========================================================
-     FAVORITES
-  ========================================================== */
+  const favorites = useShopStore((state) => state.favorites);
 
   const toggleFavorite = useShopStore(
-    (state) => state.toggleFavorite
+    (state) => state.toggleFavorite,
   );
 
-  const isFavorite = useShopStore(
-    (state) =>
-      state.favorites.some(
-        (item) => item.id === product.id
-      )
+  const isFavorite = favorites.some(
+    (favorite) =>
+      String(favorite.id) === String(product.id),
   );
 
   /* =========================================================
-     FAVORITE HANDLER
-  ========================================================== */
+     FAVORITE
+  ========================================================= */
 
-  function handleFavoriteClick(event) {
+  const handleFavorite = (event) => {
     event.preventDefault();
     event.stopPropagation();
 
     toggleFavorite(product);
-  }
-
-  /* =========================================================
-     RENDER
-  ========================================================== */
+  };
 
   return (
     <article
       className="
         group
-        flex
-        min-h-0
-        flex-col
+        relative
+        min-w-0
       "
     >
       {/* =====================================================
           PRODUCT IMAGE
+
+          GSAP yalnızca bu container'ı kontrol eder.
+
+          Ürün:
+          - adı
+          - fiyatı
+          - rengi
+          - favori state'i
+
+          animasyondan etkilenmez.
       ====================================================== */}
 
       <div
+        data-new-arrival-image
         className="
           relative
 
@@ -283,32 +400,40 @@ function ProductItem({ product }) {
 
           w-full
 
-          flex-shrink-0
-
           overflow-hidden
 
-          bg-[var(--ares-background-warm)]
+          bg-[var(--ares-background-soft)]
 
-          lg:aspect-auto
-          lg:min-h-0
-          lg:flex-1
+          will-change-[transform,opacity]
         "
       >
+        {/* ===================================================
+            IMAGE LINK
+        ==================================================== */}
+
         <Link
-          href={product.href}
-          className="block h-full w-full"
+          href={`/urunler/${product.slug}`}
+          aria-label={`${product.name} ürününü görüntüle`}
+          className="
+            absolute
+            inset-0
+            z-0
+          "
         >
           <Image
             src={product.image}
             alt={product.name}
             fill
-            sizes="(max-width: 1023px) 50vw, 25vw"
+            sizes="
+              (max-width: 639px) 50vw,
+              (max-width: 1023px) 50vw,
+              25vw
+            "
             className="
               object-cover
-              object-center
 
               transition-transform
-              duration-[900ms]
+              duration-700
 
               ease-[cubic-bezier(0.22,1,0.36,1)]
 
@@ -327,209 +452,167 @@ function ProductItem({ product }) {
               pointer-events-none
 
               absolute
+
               left-3
               top-3
               z-10
 
-              bg-[var(--ares-background-soft)]
-
-              px-2
-              py-[5px]
-
-              text-[7px]
+              text-[8px]
               font-semibold
 
               uppercase
-              tracking-[0.14em]
+              tracking-[0.16em]
 
-              text-[var(--ares-dark-deep)]
+              text-[var(--ares-dark)]
 
               sm:left-4
               sm:top-4
-              sm:text-[8px]
+              sm:text-[9px]
             "
           >
-            Yeni
+            New
           </span>
         )}
 
         {/* ===================================================
-            FAVORITE
+            FAVORITE BUTTON
         ==================================================== */}
 
         <button
           type="button"
-          onClick={handleFavoriteClick}
+          onClick={handleFavorite}
           aria-label={
             isFavorite
-              ? `${product.name} favorilerden çıkar`
-              : `${product.name} favorilere ekle`
+              ? "Favorilerden kaldır"
+              : "Favorilere ekle"
           }
-          aria-pressed={isFavorite}
           className="
             absolute
-            right-2
-            top-2
-            z-30
+
+            right-3
+            top-3
+            z-20
 
             flex
-            h-9
-            w-9
-
-            cursor-pointer
+            h-8
+            w-8
 
             items-center
             justify-center
 
             border-0
-            bg-transparent
-            p-0
 
-            text-[var(--ares-dark-deep)]
+            bg-transparent
+
+            text-[var(--ares-dark)]
 
             outline-none
 
-            transition-all
+            transition-transform
             duration-300
 
             hover:scale-110
-            hover:text-[var(--ares-brown)]
 
             focus:outline-none
             focus-visible:outline-none
 
-            sm:right-3
-            sm:top-3
+            sm:right-4
+            sm:top-4
+            sm:h-9
+            sm:w-9
           "
         >
           <Heart
-            size={17}
-            strokeWidth={1.2}
-            fill={
+            size={18}
+            strokeWidth={1.3}
+            className={
               isFavorite
-                ? "currentColor"
-                : "none"
+                ? "fill-[var(--ares-dark)]"
+                : "fill-transparent"
             }
-            className="
-              pointer-events-none
-
-              transition-all
-              duration-300
-            "
           />
         </button>
       </div>
 
       {/* =====================================================
           PRODUCT INFORMATION
+
+          Tamamen statik.
       ====================================================== */}
 
-      <div
-        className="
-          flex-shrink-0
+      <div className="pt-4 sm:pt-5">
+        {/* ===================================================
+            PRODUCT NAME
+        ==================================================== */}
 
-          pt-3
-
-          sm:pt-4
-
-          lg:pb-1
-        "
-      >
-        {/* CATEGORY */}
-
-        <p
-          className="
-            text-[7px]
-            font-semibold
-
-            uppercase
-
-            tracking-[0.15em]
-
-            text-[var(--ares-muted-light)]
-
-            sm:text-[8px]
-          "
-        >
-          {product.category}
-        </p>
-
-        {/* NAME + PRICE */}
-
-        <div
-          className="
-            mt-2
-
-            flex
-            flex-col
-
-            gap-1
-
-            xl:flex-row
-            xl:items-start
-            xl:justify-between
-            xl:gap-3
-          "
-        >
-          <Link
-            href={product.href}
+        <Link href={`/urunler/${product.slug}`}>
+          <h3
             className="
-              text-[10px]
+              font-editorial
+
+              text-[17px]
               font-medium
 
-              leading-[1.45]
+              leading-[1.1]
 
-              text-[var(--ares-dark-deep)]
+              tracking-[-0.015em]
 
-              transition-colors
+              text-[var(--ares-dark)]
+
+              transition-opacity
               duration-300
 
-              hover:text-[var(--ares-brown)]
+              hover:opacity-65
 
-              sm:text-[11px]
+              sm:text-[19px]
 
-              lg:text-[12px]
-
-              xl:text-[13px]
+              lg:text-[20px]
             "
           >
             {product.name}
-          </Link>
+          </h3>
+        </Link>
 
-          <span
-            className="
-              flex-shrink-0
-
-              text-[10px]
-              font-medium
-
-              text-[var(--ares-dark-deep)]
-
-              sm:text-[11px]
-
-              lg:text-[12px]
-            "
-          >
-            {product.price}
-          </span>
-        </div>
-
-        {/* COLOR */}
+        {/* ===================================================
+            PRODUCT COLOR
+        ==================================================== */}
 
         <p
           className="
-            mt-1.5
+            mt-2
 
-            text-[8px]
+            text-[9px]
+
+            uppercase
+            tracking-[0.12em]
 
             text-[var(--ares-muted)]
 
-            sm:text-[9px]
-
-            lg:text-[10px]
+            sm:text-[10px]
           "
         >
           {product.color}
+        </p>
+
+        {/* ===================================================
+            PRODUCT PRICE
+        ==================================================== */}
+
+        <p
+          className="
+            mt-3
+
+            text-[11px]
+            font-medium
+
+            tracking-[0.02em]
+
+            text-[var(--ares-dark)]
+
+            sm:text-[12px]
+          "
+        >
+          {formatPrice(product.price)}
         </p>
       </div>
     </article>
@@ -543,43 +626,43 @@ function ProductItem({ product }) {
 function AllProductsLink() {
   return (
     <Link
-      href="/urunler?filter=new"
+      href="/urunler"
       className="
         group
 
         inline-flex
-        w-fit
-
         items-center
-        gap-4
+
+        gap-3
 
         border-b
-        border-[var(--ares-dark)]
+        border-[var(--ares-border-dark)]
 
         pb-2
 
-        text-[8px]
+        text-[9px]
         font-semibold
 
         uppercase
+        tracking-[0.14em]
 
-        tracking-[0.16em]
+        text-[var(--ares-dark)]
 
-        text-[var(--ares-dark-deep)]
+        transition-colors
+        duration-300
 
-        sm:text-[9px]
+        hover:border-[var(--ares-gold)]
 
-        lg:text-[10px]
+        sm:text-[10px]
       "
     >
-      Tümünü Gör
+      Tüm Ürünler
 
       <ArrowUpRight
         size={15}
         strokeWidth={1.3}
         className="
           transition-transform
-
           duration-500
 
           ease-[cubic-bezier(0.22,1,0.36,1)]
@@ -590,4 +673,16 @@ function AllProductsLink() {
       />
     </Link>
   );
+}
+
+/* =========================================================
+   PRICE FORMATTER
+========================================================= */
+
+function formatPrice(price) {
+  return new Intl.NumberFormat("tr-TR", {
+    style: "currency",
+    currency: "TRY",
+    maximumFractionDigits: 0,
+  }).format(price);
 }
