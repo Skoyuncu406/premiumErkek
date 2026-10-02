@@ -11,10 +11,16 @@ import {
   UserRound,
 } from "lucide-react";
 
+import useAuthStore from "@/store/useAuthStore";
+
+/* =========================================================
+   ACCOUNT PAGE
+========================================================= */
+
 export default function AccountPage() {
-  /* =========================================================
+  /* =======================================================
      PASSWORD VISIBILITY
-  ========================================================== */
+  ======================================================== */
 
   const [
     loginPasswordVisible,
@@ -31,9 +37,152 @@ export default function AccountPage() {
     setRegisterPasswordAgainVisible,
   ] = useState(false);
 
-  /* =========================================================
-     RENDER
-  ========================================================== */
+  /* =======================================================
+     AUTH
+  ======================================================== */
+
+  const currentUser = useAuthStore(
+    (state) => state.currentUser,
+  );
+
+  const login = useAuthStore(
+    (state) => state.login,
+  );
+
+  const register = useAuthStore(
+    (state) => state.register,
+  );
+
+  const logout = useAuthStore(
+    (state) => state.logout,
+  );
+
+  /* =======================================================
+     MESSAGES
+  ======================================================== */
+
+  const [
+    loginMessage,
+    setLoginMessage,
+  ] = useState("");
+
+  const [
+    registerMessage,
+    setRegisterMessage,
+  ] = useState("");
+
+  /* =======================================================
+     LOGIN
+  ======================================================== */
+
+  function handleLogin(event) {
+    event.preventDefault();
+
+    setLoginMessage("");
+
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+
+    const email = formData.get("email");
+    const password =
+      formData.get("password");
+
+    const result = login({
+      email,
+      password,
+    });
+
+    if (!result?.success) {
+      setLoginMessage(
+        result?.message ||
+          "Giriş işlemi gerçekleştirilemedi.",
+      );
+
+      return;
+    }
+
+    setLoginMessage("");
+    form.reset();
+  }
+
+  /* =======================================================
+     REGISTER
+  ======================================================== */
+
+  function handleRegister(event) {
+    event.preventDefault();
+
+    setRegisterMessage("");
+
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+
+    const name = formData.get("name");
+    const surname =
+      formData.get("surname");
+
+    const email = formData.get("email");
+
+    const password =
+      formData.get("password");
+
+    const passwordAgain =
+      formData.get("passwordAgain");
+
+    const terms = formData.get("terms");
+
+    if (password !== passwordAgain) {
+      setRegisterMessage(
+        "Şifreler birbiriyle eşleşmiyor.",
+      );
+
+      return;
+    }
+
+    if (!terms) {
+      setRegisterMessage(
+        "Devam etmek için üyelik koşullarını kabul edin.",
+      );
+
+      return;
+    }
+
+    const result = register({
+      name,
+      surname,
+      email,
+      password,
+    });
+
+    if (!result?.success) {
+      setRegisterMessage(
+        result?.message ||
+          "Hesap oluşturulamadı.",
+      );
+
+      return;
+    }
+
+    setRegisterMessage("");
+    form.reset();
+  }
+
+  /* =======================================================
+     AUTHENTICATED ACCOUNT
+  ======================================================== */
+
+  if (currentUser) {
+    return (
+      <AuthenticatedAccount
+        user={currentUser}
+        onLogout={logout}
+      />
+    );
+  }
+
+  /* =======================================================
+     LOGIN / REGISTER
+  ======================================================== */
 
   return (
     <section
@@ -45,19 +194,17 @@ export default function AccountPage() {
         py-5
 
         sm:py-8
-
         lg:py-10
       "
     >
       <div className="ares-container-wide">
-        {/* ===================================================
-            SMALL PAGE HEADER
-        ==================================================== */}
+        {/* =================================================
+            PAGE HEADER
+        ================================================== */}
 
         <div
           className="
             flex
-
             items-center
             justify-between
 
@@ -73,7 +220,6 @@ export default function AccountPage() {
             className="
               flex
               items-center
-
               gap-3
             "
           >
@@ -110,9 +256,9 @@ export default function AccountPage() {
           />
         </div>
 
-        {/* ===================================================
+        {/* =================================================
             ACCOUNT GRID
-        ==================================================== */}
+        ================================================== */}
 
         <div
           className="
@@ -140,48 +286,15 @@ export default function AccountPage() {
               lg:pr-14
 
               xl:pr-20
-
               2xl:pr-24
             "
           >
             <div className="max-w-[520px]">
-              {/* =============================================
-                  LOGIN INTRO
-              ============================================== */}
+              {/* INTRO */}
 
-              <div
-                className="
-                  flex
-                  items-center
-
-                  gap-3
-                "
-              >
-                <span
-                  className="
-                    h-px
-                    w-7
-
-                    bg-[var(--ares-gold)]
-                  "
-                />
-
-                <p
-                  className="
-                    text-[7px]
-                    font-semibold
-
-                    uppercase
-                    tracking-[0.18em]
-
-                    text-[var(--ares-muted)]
-
-                    sm:text-[8px]
-                  "
-                >
-                  Mevcut Müşteri
-                </p>
-              </div>
+              <SectionLabel>
+                Mevcut Müşteri
+              </SectionLabel>
 
               <h1
                 className="
@@ -199,7 +312,6 @@ export default function AccountPage() {
                   text-[var(--ares-dark-deep)]
 
                   sm:text-[44px]
-
                   lg:text-[48px]
                 "
               >
@@ -213,7 +325,6 @@ export default function AccountPage() {
                   max-w-[410px]
 
                   text-[10px]
-
                   leading-[1.8]
 
                   text-[var(--ares-muted)]
@@ -221,24 +332,22 @@ export default function AccountPage() {
                   sm:text-[11px]
                 "
               >
-                Siparişlerinizi görüntülemek,
-                kayıtlı bilgilerinize erişmek ve
-                alışverişinizi daha hızlı tamamlamak
-                için hesabınıza giriş yapın.
+                Siparişlerinizi
+                görüntülemek, kayıtlı
+                bilgilerinize erişmek ve
+                alışverişinizi daha hızlı
+                tamamlamak için hesabınıza
+                giriş yapın.
               </p>
 
-              {/* =============================================
+              {/* ===========================================
                   LOGIN FORM
-              ============================================== */}
+              ============================================ */}
 
               <form
-                onSubmit={(event) =>
-                  event.preventDefault()
-                }
+                onSubmit={handleLogin}
                 className="mt-9"
               >
-                {/* EMAIL */}
-
                 <AccountInput
                   id="login-email"
                   label="E-posta"
@@ -246,9 +355,8 @@ export default function AccountPage() {
                   name="email"
                   autoComplete="email"
                   placeholder="E-posta adresiniz"
+                  required
                 />
-
-                {/* PASSWORD */}
 
                 <div className="mt-7">
                   <PasswordInput
@@ -257,12 +365,16 @@ export default function AccountPage() {
                     name="password"
                     autoComplete="current-password"
                     placeholder="Şifreniz"
-                    visible={loginPasswordVisible}
+                    visible={
+                      loginPasswordVisible
+                    }
                     onToggle={() =>
                       setLoginPasswordVisible(
-                        (current) => !current
+                        (current) =>
+                          !current,
                       )
                     }
+                    required
                   />
                 </div>
 
@@ -295,6 +407,9 @@ export default function AccountPage() {
 
                       hover:text-[var(--ares-dark-deep)]
 
+                      focus:outline-none
+                      focus-visible:outline-none
+
                       sm:text-[8px]
                     "
                   >
@@ -302,13 +417,20 @@ export default function AccountPage() {
                   </button>
                 </div>
 
-                {/* LOGIN BUTTON */}
+                {/* MESSAGE */}
+
+                {loginMessage && (
+                  <FormMessage>
+                    {loginMessage}
+                  </FormMessage>
+                )}
+
+                {/* BUTTON */}
 
                 <button
                   type="submit"
                   className="
                     ares-button
-
                     group
 
                     mt-7
@@ -335,9 +457,7 @@ export default function AccountPage() {
                 </button>
               </form>
 
-              {/* =============================================
-                  LOGIN SECURITY
-              ============================================== */}
+              {/* SECURITY */}
 
               <div
                 className="
@@ -377,10 +497,11 @@ export default function AccountPage() {
                     text-[var(--ares-muted-light)]
                   "
                 >
-                  Hesap bilgileriniz güvenli bağlantı
-                  üzerinden işlenir ve yalnızca
-                  hesabınıza erişim amacıyla
-                  kullanılır.
+                  Bu demo sürümünde hesap
+                  bilgileriniz yalnızca
+                  üyelik deneyimini
+                  göstermek amacıyla
+                  tarayıcınızda saklanır.
                 </p>
               </div>
             </div>
@@ -400,48 +521,13 @@ export default function AccountPage() {
               lg:pl-14
 
               xl:pl-20
-
               2xl:pl-24
             "
           >
             <div className="max-w-[520px]">
-              {/* =============================================
-                  REGISTER INTRO
-              ============================================== */}
-
-              <div
-                className="
-                  flex
-                  items-center
-
-                  gap-3
-                "
-              >
-                <span
-                  className="
-                    h-px
-                    w-7
-
-                    bg-[var(--ares-gold)]
-                  "
-                />
-
-                <p
-                  className="
-                    text-[7px]
-                    font-semibold
-
-                    uppercase
-                    tracking-[0.18em]
-
-                    text-[var(--ares-muted)]
-
-                    sm:text-[8px]
-                  "
-                >
-                  Yeni Müşteri
-                </p>
-              </div>
+              <SectionLabel>
+                Yeni Müşteri
+              </SectionLabel>
 
               <h2
                 className="
@@ -459,7 +545,6 @@ export default function AccountPage() {
                   text-[var(--ares-dark-deep)]
 
                   sm:text-[44px]
-
                   lg:text-[48px]
                 "
               >
@@ -473,7 +558,6 @@ export default function AccountPage() {
                   max-w-[430px]
 
                   text-[10px]
-
                   leading-[1.8]
 
                   text-[var(--ares-muted)]
@@ -482,28 +566,26 @@ export default function AccountPage() {
                 "
               >
                 Hesabınızı oluşturarak
-                siparişlerinizi takip edebilir, adres
-                bilgilerinizi yönetebilir ve alışveriş
-                sürecinizi daha hızlı
-                tamamlayabilirsiniz.
+                favorilerinizi yönetebilir,
+                alışveriş deneyiminizi
+                kişiselleştirebilir ve ARES
+                parçaları hakkında
+                değerlendirme yapabilirsiniz.
               </p>
 
-              {/* =============================================
+              {/* ===========================================
                   REGISTER FORM
-              ============================================== */}
+              ============================================ */}
 
               <form
-                onSubmit={(event) =>
-                  event.preventDefault()
-                }
+                onSubmit={handleRegister}
                 className="mt-9"
               >
-                {/* NAME + SURNAME */}
+                {/* NAME */}
 
                 <div
                   className="
                     grid
-
                     gap-7
 
                     sm:grid-cols-2
@@ -517,6 +599,7 @@ export default function AccountPage() {
                     name="name"
                     autoComplete="given-name"
                     placeholder="Adınız"
+                    required
                   />
 
                   <AccountInput
@@ -526,6 +609,7 @@ export default function AccountPage() {
                     name="surname"
                     autoComplete="family-name"
                     placeholder="Soyadınız"
+                    required
                   />
                 </div>
 
@@ -539,6 +623,7 @@ export default function AccountPage() {
                     name="email"
                     autoComplete="email"
                     placeholder="E-posta adresiniz"
+                    required
                   />
                 </div>
 
@@ -549,7 +634,6 @@ export default function AccountPage() {
                     mt-7
 
                     grid
-
                     gap-7
 
                     sm:grid-cols-2
@@ -567,9 +651,11 @@ export default function AccountPage() {
                     }
                     onToggle={() =>
                       setRegisterPasswordVisible(
-                        (current) => !current
+                        (current) =>
+                          !current,
                       )
                     }
+                    required
                   />
 
                   <PasswordInput
@@ -583,15 +669,15 @@ export default function AccountPage() {
                     }
                     onToggle={() =>
                       setRegisterPasswordAgainVisible(
-                        (current) => !current
+                        (current) =>
+                          !current,
                       )
                     }
+                    required
                   />
                 </div>
 
-                {/* ===========================================
-                    TERMS
-                ============================================ */}
+                {/* TERMS */}
 
                 <label
                   className="
@@ -599,7 +685,6 @@ export default function AccountPage() {
 
                     flex
                     cursor-pointer
-
                     items-start
 
                     gap-3
@@ -607,6 +692,8 @@ export default function AccountPage() {
                 >
                   <input
                     type="checkbox"
+                    name="terms"
+                    value="accepted"
                     className="
                       peer
                       sr-only
@@ -618,7 +705,6 @@ export default function AccountPage() {
                       mt-[1px]
 
                       flex
-
                       h-[16px]
                       w-[16px]
 
@@ -662,19 +748,26 @@ export default function AccountPage() {
                       text-[var(--ares-muted)]
                     "
                   >
-                    Üyelik koşullarını ve gizlilik
-                    politikasını okudum ve kabul
-                    ediyorum.
+                    Üyelik koşullarını ve
+                    gizlilik politikasını
+                    okudum ve kabul ediyorum.
                   </span>
                 </label>
 
-                {/* REGISTER BUTTON */}
+                {/* MESSAGE */}
+
+                {registerMessage && (
+                  <FormMessage>
+                    {registerMessage}
+                  </FormMessage>
+                )}
+
+                {/* BUTTON */}
 
                 <button
                   type="submit"
                   className="
                     ares-button
-
                     group
 
                     mt-7
@@ -686,7 +779,9 @@ export default function AccountPage() {
                     px-6
                   "
                 >
-                  <span>Hesap Oluştur</span>
+                  <span>
+                    Hesap Oluştur
+                  </span>
 
                   <ArrowRight
                     size={14}
@@ -701,9 +796,7 @@ export default function AccountPage() {
                 </button>
               </form>
 
-              {/* =============================================
-                  BENEFITS
-              ============================================== */}
+              {/* BENEFITS */}
 
               <div
                 className="
@@ -725,12 +818,12 @@ export default function AccountPage() {
 
                 <Benefit
                   number="02"
-                  text="Adres Yönetimi"
+                  text="Favori Yönetimi"
                 />
 
                 <Benefit
                   number="03"
-                  text="Hızlı Alışveriş"
+                  text="Değerlendirmeler"
                 />
               </div>
             </div>
@@ -741,10 +834,463 @@ export default function AccountPage() {
   );
 }
 
+/* =========================================================
+   AUTHENTICATED ACCOUNT
+========================================================= */
+
+function AuthenticatedAccount({
+  user,
+  onLogout,
+}) {
+  const fullName = [
+    user?.name,
+    user?.surname,
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  return (
+    <section
+      className="
+        min-h-[70vh]
+
+        bg-[var(--ares-background-soft)]
+
+        py-5
+
+        sm:py-8
+        lg:py-10
+      "
+    >
+      <div className="ares-container-wide">
+        {/* HEADER */}
+
+        <div
+          className="
+            flex
+            items-center
+            justify-between
+
+            border-b
+            border-[var(--ares-border)]
+
+            pb-4
+
+            sm:pb-5
+          "
+        >
+          <div
+            className="
+              flex
+              items-center
+              gap-3
+            "
+          >
+            <span
+              className="
+                h-px
+                w-7
+
+                bg-[var(--ares-gold)]
+              "
+            />
+
+            <p
+              className="
+                text-[8px]
+                font-semibold
+
+                uppercase
+                tracking-[0.18em]
+
+                text-[var(--ares-muted)]
+              "
+            >
+              ARES / Private Client
+            </p>
+          </div>
+
+          <UserRound
+            size={15}
+            strokeWidth={1.15}
+            className="
+              text-[var(--ares-muted)]
+            "
+          />
+        </div>
+
+        {/* CONTENT */}
+
+        <div
+          className="
+            grid
+
+            py-12
+
+            sm:py-16
+
+            lg:grid-cols-12
+            lg:py-20
+          "
+        >
+          {/* INTRO */}
+
+          <div
+            className="
+              lg:col-span-7
+              lg:pr-16
+
+              xl:pr-24
+            "
+          >
+            <SectionLabel>
+              ARES Member
+            </SectionLabel>
+
+            <h1
+              className="
+                mt-5
+
+                max-w-[650px]
+
+                font-editorial
+
+                text-[40px]
+                font-medium
+
+                leading-[0.95]
+
+                tracking-[-0.035em]
+
+                text-[var(--ares-dark-deep)]
+
+                sm:text-[48px]
+                lg:text-[58px]
+              "
+            >
+              Hoş geldiniz,
+              <br />
+              {user?.name}.
+            </h1>
+
+            <p
+              className="
+                mt-6
+
+                max-w-[480px]
+
+                text-[10px]
+                leading-[1.8]
+
+                text-[var(--ares-muted)]
+
+                sm:text-[11px]
+              "
+            >
+              ARES hesabınız üzerinden
+              favorilerinizi yönetebilir,
+              alışverişinizi sürdürebilir ve
+              ARES parçaları hakkında
+              değerlendirme yapabilirsiniz.
+            </p>
+          </div>
+
+          {/* INFORMATION */}
+
+          <div
+            className="
+              mt-12
+
+              border-t
+              border-[var(--ares-border)]
+
+              pt-8
+
+              lg:col-span-5
+              lg:mt-0
+              lg:border-l
+              lg:border-t-0
+              lg:pl-14
+              lg:pt-0
+
+              xl:pl-20
+            "
+          >
+            <p
+              className="
+                text-[7px]
+                font-semibold
+
+                uppercase
+                tracking-[0.18em]
+
+                text-[var(--ares-muted-light)]
+
+                sm:text-[8px]
+              "
+            >
+              Üyelik Bilgileri
+            </p>
+
+            <AccountInformation
+              label="Ad Soyad"
+              value={fullName}
+            />
+
+            <AccountInformation
+              label="E-posta"
+              value={user?.email}
+            />
+
+            {/* STATUS */}
+
+            <div
+              className="
+                mt-8
+
+                flex
+                items-center
+                gap-3
+
+                border-t
+                border-[var(--ares-border)]
+
+                pt-6
+              "
+            >
+              <span
+                className="
+                  flex
+                  h-6
+                  w-6
+
+                  items-center
+                  justify-center
+
+                  bg-[var(--ares-dark-deep)]
+
+                  text-[var(--ares-background-soft)]
+                "
+              >
+                <Check
+                  size={11}
+                  strokeWidth={1.5}
+                />
+              </span>
+
+              <div>
+                <p
+                  className="
+                    text-[8px]
+                    font-semibold
+
+                    uppercase
+                    tracking-[0.12em]
+
+                    text-[var(--ares-dark-deep)]
+                  "
+                >
+                  Aktif Üye
+                </p>
+
+                <p
+                  className="
+                    mt-1
+
+                    text-[8px]
+
+                    text-[var(--ares-muted-light)]
+                  "
+                >
+                  Ürün değerlendirmesi
+                  yapabilirsiniz.
+                </p>
+              </div>
+            </div>
+
+            {/* LOGOUT */}
+
+            <button
+              type="button"
+              onClick={onLogout}
+              className="
+                group
+
+                mt-10
+
+                flex
+                min-h-[48px]
+                w-full
+
+                items-center
+                justify-between
+
+                bg-[#211A16]
+
+                px-6
+
+                text-[#FAF8F3]
+
+                transition-colors
+                duration-300
+
+                hover:bg-[#35271F]
+
+                focus:outline-none
+                focus-visible:outline-none
+              "
+            >
+              <span
+                className="
+                  text-[8px]
+                  font-semibold
+
+                  uppercase
+                  tracking-[0.14em]
+
+                  text-[#FAF8F3]
+                "
+              >
+                Çıkış Yap
+              </span>
+
+              <ArrowRight
+                size={14}
+                strokeWidth={1.3}
+                className="
+                  text-[#C9AD78]
+
+                  transition-transform
+                  duration-300
+
+                  group-hover:translate-x-1
+                "
+              />
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* =========================================================
+   SECTION LABEL
+========================================================= */
+
+function SectionLabel({ children }) {
+  return (
+    <div
+      className="
+        flex
+        items-center
+        gap-3
+      "
+    >
+      <span
+        className="
+          h-px
+          w-7
+
+          bg-[var(--ares-gold)]
+        "
+      />
+
+      <p
+        className="
+          text-[7px]
+          font-semibold
+
+          uppercase
+          tracking-[0.18em]
+
+          text-[var(--ares-muted)]
+
+          sm:text-[8px]
+        "
+      >
+        {children}
+      </p>
+    </div>
+  );
+}
+
+/* =========================================================
+   FORM MESSAGE
+========================================================= */
+
+function FormMessage({ children }) {
+  return (
+    <p
+      role="alert"
+      className="
+        mt-5
+
+        text-[9px]
+        leading-[1.6]
+
+        text-[var(--ares-brown)]
+      "
+    >
+      {children}
+    </p>
+  );
+}
+
+/* =========================================================
+   ACCOUNT INFORMATION
+========================================================= */
+
+function AccountInformation({
+  label,
+  value,
+}) {
+  return (
+    <div
+      className="
+        mt-7
+
+        border-b
+        border-[var(--ares-border)]
+
+        pb-5
+      "
+    >
+      <p
+        className="
+          text-[7px]
+          font-semibold
+
+          uppercase
+          tracking-[0.14em]
+
+          text-[var(--ares-muted-light)]
+        "
+      >
+        {label}
+      </p>
+
+      <p
+        className="
+          mt-2
+
+          text-[11px]
+          font-medium
+
+          text-[var(--ares-dark-deep)]
+
+          sm:text-[12px]
+        "
+      >
+        {value || "—"}
+      </p>
+    </div>
+  );
+}
 
 /* =========================================================
    ACCOUNT INPUT
-========================================================== */
+========================================================= */
 
 function AccountInput({
   id,
@@ -753,6 +1299,7 @@ function AccountInput({
   name,
   placeholder,
   autoComplete,
+  required = false,
 }) {
   return (
     <div>
@@ -781,6 +1328,7 @@ function AccountInput({
         name={name}
         placeholder={placeholder}
         autoComplete={autoComplete}
+        required={required}
         className="
           ares-account-input
 
@@ -800,10 +1348,9 @@ function AccountInput({
   );
 }
 
-
 /* =========================================================
    PASSWORD INPUT
-========================================================== */
+========================================================= */
 
 function PasswordInput({
   id,
@@ -813,6 +1360,7 @@ function PasswordInput({
   autoComplete,
   visible,
   onToggle,
+  required = false,
 }) {
   return (
     <div>
@@ -852,6 +1400,7 @@ function PasswordInput({
           name={name}
           placeholder={placeholder}
           autoComplete={autoComplete}
+          required={required}
           className="
             ares-account-input
 
@@ -879,12 +1428,10 @@ function PasswordInput({
           }
           className="
             absolute
-
             right-0
             top-1/2
 
             flex
-
             h-9
             w-9
 
@@ -921,10 +1468,9 @@ function PasswordInput({
   );
 }
 
-
 /* =========================================================
    BENEFIT
-========================================================== */
+========================================================= */
 
 function Benefit({
   number,

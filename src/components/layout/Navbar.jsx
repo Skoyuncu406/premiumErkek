@@ -19,6 +19,7 @@ import {
   X,
 } from "lucide-react";
 
+import ProductRating from "@/components/reviews/ProductRating";
 import useShopStore from "@/store/useShopStore";
 import { products } from "@/data/products";
 
@@ -1529,52 +1530,127 @@ function SearchProduct({
   product,
   onNavigate,
 }) {
+  /* =======================================================
+     PRODUCT URL
+  ======================================================== */
+
+  const productHref =
+    `/urunler/${product.slug}`;
+
+  const reviewsHref =
+    `/urunler/${product.slug}?reviews=1`;
+
+  /* =======================================================
+     PRODUCT IMAGE
+  ======================================================== */
+
   const productImage =
     product.image ||
     product.images?.[0] ||
     "/images/products/product-01.jpg";
 
+  /* =======================================================
+     RENDER
+  ======================================================== */
+
   return (
-    <Link
-      href={`/urunler/${product.slug}`}
-      onClick={onNavigate}
+    <article
       className="
         group
-
         min-w-0
       "
     >
-      <div
+      {/* ===================================================
+          PRODUCT IMAGE
+      ==================================================== */}
+
+      <Link
+        href={productHref}
+        onClick={onNavigate}
+        aria-label={`${product.name} ürününü görüntüle`}
         className="
-          relative
+          block
+          outline-none
 
-          aspect-[3/4]
-
-          overflow-hidden
-
-          bg-[var(--ares-background-warm)]
+          focus:outline-none
+          focus-visible:outline-none
         "
       >
-        <Image
-          src={productImage}
-          alt={product.name}
-          fill
-          sizes="(max-width: 767px) 50vw, (max-width: 1023px) 33vw, 17vw"
+        <div
           className="
-            object-cover
-            object-center
+            relative
 
-            transition-transform
-            duration-[800ms]
+            aspect-[3/4]
 
-            ease-[cubic-bezier(0.22,1,0.36,1)]
+            overflow-hidden
 
-            group-hover:scale-[1.025]
+            bg-[var(--ares-background-warm)]
           "
-        />
-      </div>
+        >
+          <Image
+            src={productImage}
+            alt={product.name}
+            fill
+            sizes="
+              (max-width: 767px) 50vw,
+              (max-width: 1023px) 33vw,
+              17vw
+            "
+            className="
+              object-cover
+              object-center
+
+              transition-transform
+              duration-[800ms]
+
+              ease-[cubic-bezier(0.22,1,0.36,1)]
+
+              group-hover:scale-[1.025]
+            "
+          />
+
+          {/* NEW */}
+
+          {product.isNew && (
+            <span
+              className="
+                absolute
+                left-2.5
+                top-2.5
+
+                bg-[var(--ares-background-soft)]/95
+
+                px-2
+                py-[5px]
+
+                text-[6px]
+                font-semibold
+
+                uppercase
+                tracking-[0.14em]
+
+                text-[var(--ares-dark-deep)]
+
+                backdrop-blur-sm
+
+                sm:left-3
+                sm:top-3
+                sm:text-[7px]
+              "
+            >
+              Yeni
+            </span>
+          )}
+        </div>
+      </Link>
+
+      {/* ===================================================
+          PRODUCT INFORMATION
+      ==================================================== */}
 
       <div className="pt-3">
+        {/* CATEGORY */}
+
         <p
           className="
             truncate
@@ -1591,9 +1667,14 @@ function SearchProduct({
           {product.category}
         </p>
 
-        <p
+        {/* PRODUCT NAME */}
+
+        <Link
+          href={productHref}
+          onClick={onNavigate}
           className="
             mt-1
+            block
 
             truncate
 
@@ -1605,13 +1686,18 @@ function SearchProduct({
             transition-colors
             duration-300
 
-            group-hover:text-[var(--ares-brown)]
+            hover:text-[var(--ares-brown)]
+
+            focus:outline-none
+            focus-visible:outline-none
 
             sm:text-[10px]
           "
         >
           {product.name}
-        </p>
+        </Link>
+
+        {/* PRICE */}
 
         <p
           className="
@@ -1624,8 +1710,39 @@ function SearchProduct({
         >
           {product.formattedPrice}
         </p>
+
+        {/* =================================================
+            PRODUCT RATING
+        ================================================== */}
+
+        <Link
+          href={reviewsHref}
+          onClick={onNavigate}
+          aria-label={`${product.name} değerlendirmelerini görüntüle`}
+          className="
+            mt-2
+
+            inline-flex
+            max-w-full
+
+            outline-none
+
+            transition-opacity
+            duration-300
+
+            hover:opacity-65
+
+            focus:outline-none
+            focus-visible:outline-none
+          "
+        >
+          <ProductRating
+            productId={product.id}
+            compact
+          />
+        </Link>
       </div>
-    </Link>
+    </article>
   );
 }
 

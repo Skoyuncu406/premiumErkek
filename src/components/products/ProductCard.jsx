@@ -4,87 +4,111 @@ import Image from "next/image";
 import Link from "next/link";
 import { Heart } from "lucide-react";
 
+import ProductRating from "@/components/reviews/ProductRating";
 import useShopStore from "@/store/useShopStore";
 
+/* =========================================================
+   PRODUCT CARD
+========================================================= */
+
 export default function ProductCard({ product }) {
-  /* =========================================================
+  /* =======================================================
      FAVORITES
-  ========================================================== */
+  ======================================================== */
 
   const toggleFavorite = useShopStore(
-    (state) => state.toggleFavorite
+    (state) => state.toggleFavorite,
   );
 
   const isFavorite = useShopStore(
     (state) =>
       state.favorites.some(
-        (item) => item.id === product.id
-      )
+        (item) =>
+          String(item.id) ===
+          String(product.id),
+      ),
   );
 
-  /* =========================================================
+  /* =======================================================
      IMAGE
-  ========================================================== */
+  ======================================================== */
 
   const productImage =
     product.image ||
     product.images?.[0] ||
     "/images/products/product-01.jpg";
 
-  /* =========================================================
+  /* =======================================================
      FAVORITE HANDLER
-  ========================================================== */
+  ======================================================== */
 
-  const handleFavoriteClick = (event) => {
+  function handleFavoriteClick(event) {
     event.preventDefault();
     event.stopPropagation();
 
     toggleFavorite(product);
-  };
+  }
 
-  /* =========================================================
+  /* =======================================================
      RENDER
-  ========================================================== */
+  ======================================================== */
 
   return (
     <article className="group min-w-0">
-      {/* IMAGE */}
+      {/* ===================================================
+          IMAGE
+      ==================================================== */}
 
       <div
         className="
           relative
+
           aspect-[3/4]
+
           w-full
+
           overflow-hidden
+
           bg-[var(--ares-background-warm)]
         "
       >
         <Link
           href={`/urunler/${product.slug}`}
+          aria-label={`${product.name} ürününü görüntüle`}
           className="block h-full w-full"
         >
           <Image
             src={productImage}
             alt={product.name}
             fill
-            sizes="(max-width: 639px) 50vw, (max-width: 1023px) 33vw, 25vw"
+            sizes="
+              (max-width: 639px) 50vw,
+              (max-width: 1023px) 33vw,
+              25vw
+            "
             className="
               object-cover
               object-center
+
               transition-transform
               duration-[900ms]
+
               ease-[cubic-bezier(0.22,1,0.36,1)]
+
               group-hover:scale-[1.025]
             "
           />
         </Link>
 
-        {/* NEW */}
+        {/* =================================================
+            NEW
+        ================================================== */}
 
         {product.isNew && (
           <span
             className="
               pointer-events-none
+
               absolute
               left-3
               top-3
@@ -97,6 +121,7 @@ export default function ProductCard({ product }) {
 
               text-[7px]
               font-semibold
+
               uppercase
               tracking-[0.14em]
 
@@ -111,7 +136,9 @@ export default function ProductCard({ product }) {
           </span>
         )}
 
-        {/* FAVORITE */}
+        {/* =================================================
+            FAVORITE
+        ================================================== */}
 
         <button
           type="button"
@@ -131,7 +158,9 @@ export default function ProductCard({ product }) {
             flex
             h-10
             w-10
+
             cursor-pointer
+
             items-center
             justify-center
 
@@ -163,6 +192,7 @@ export default function ProductCard({ product }) {
             }
             className="
               pointer-events-none
+
               transition-all
               duration-300
             "
@@ -170,31 +200,42 @@ export default function ProductCard({ product }) {
         </button>
       </div>
 
-      {/* PRODUCT INFORMATION */}
+      {/* ===================================================
+          PRODUCT INFORMATION
+      ==================================================== */}
 
       <div className="pt-4">
-        {/* CATEGORY */}
+        {/* =================================================
+            CATEGORY
+        ================================================== */}
 
         <p
           className="
             text-[7px]
             font-semibold
+
             uppercase
             tracking-[0.15em]
+
             text-[var(--ares-muted-light)]
+
             sm:text-[8px]
           "
         >
           {product.category}
         </p>
 
-        {/* NAME / PRICE */}
+        {/* =================================================
+            NAME / PRICE
+        ================================================== */}
 
         <div
           className="
             mt-2
+
             flex
             flex-col
+
             gap-1
 
             xl:flex-row
@@ -210,6 +251,7 @@ export default function ProductCard({ product }) {
 
               text-[10px]
               font-medium
+
               leading-[1.5]
 
               text-[var(--ares-dark-deep)]
@@ -245,18 +287,47 @@ export default function ProductCard({ product }) {
           </span>
         </div>
 
-        {/* COLOR */}
+        {/* =================================================
+            COLOR
+        ================================================== */}
 
         <p
           className="
             mt-1.5
+
             text-[8px]
+
             text-[var(--ares-muted)]
+
             sm:text-[9px]
           "
         >
           {product.color}
         </p>
+
+        {/* =================================================
+            PRODUCT RATING
+        ================================================== */}
+
+        <Link
+          href={`/urunler/${product.slug}?reviews=1`}
+          aria-label={`${product.name} değerlendirmelerini görüntüle`}
+          className="
+            mt-2.5
+
+            inline-flex
+
+            outline-none
+
+            focus:outline-none
+            focus-visible:outline-none
+          "
+        >
+          <ProductRating
+            productId={product.id}
+            compact
+          />
+        </Link>
       </div>
     </article>
   );

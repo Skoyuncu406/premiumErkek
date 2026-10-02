@@ -13,13 +13,18 @@ import {
 } from "lucide-react";
 
 import SizeGuide from "./SizeGuide";
+import ProductRating from "@/components/reviews/ProductRating";
+import ReviewDrawer from "@/components/reviews/ReviewDrawer";
 import useShopStore from "@/store/useShopStore";
 
 /* =========================================================
    PRODUCT DETAIL
 ========================================================= */
 
-export default function ProductDetail({ product }) {
+export default function ProductDetail({
+  product,
+  openReviews = false,
+}) {
   /* =======================================================
      GALLERY
   ======================================================== */
@@ -55,6 +60,9 @@ export default function ProductDetail({ product }) {
   const [sizeGuideOpen, setSizeGuideOpen] =
     useState(false);
 
+const [reviewsOpen, setReviewsOpen] =
+  useState(openReviews);
+
   const [sizeError, setSizeError] =
     useState(false);
 
@@ -66,15 +74,15 @@ export default function ProductDetail({ product }) {
   ======================================================== */
 
   const addToCart = useShopStore(
-    (state) => state.addToCart
+    (state) => state.addToCart,
   );
 
   const toggleFavorite = useShopStore(
-    (state) => state.toggleFavorite
+    (state) => state.toggleFavorite,
   );
 
   const favorites = useShopStore(
-    (state) => state.favorites
+    (state) => state.favorites,
   );
 
   /* =======================================================
@@ -85,7 +93,7 @@ export default function ProductDetail({ product }) {
     ? favorites.some(
         (item) =>
           String(item?.id) ===
-          String(product?.id)
+          String(product?.id),
       )
     : false;
 
@@ -99,12 +107,21 @@ export default function ProductDetail({ product }) {
       : [];
 
   /* =======================================================
-     RESET ACTIVE IMAGE
+     RESET PRODUCT STATE
   ======================================================== */
 
   useEffect(() => {
     setActiveImage(gallery[0]);
   }, [gallery]);
+
+useEffect(() => {
+  setSelectedSize("");
+  setQuantity(1);
+  setSizeError(false);
+  setAddedToCart(false);
+  setReviewsOpen(openReviews);
+  setSizeGuideOpen(false);
+}, [product?.id, openReviews]);
 
   /* =======================================================
      QUANTITY
@@ -156,11 +173,10 @@ export default function ProductDetail({ product }) {
       return;
     }
 
-    const safeQuantity =
-      Math.max(
-        1,
-        Number(quantity) || 1
-      );
+    const safeQuantity = Math.max(
+      1,
+      Number(quantity) || 1,
+    );
 
     addToCart({
       product: {
@@ -271,11 +287,7 @@ export default function ProductDetail({ product }) {
                 Giyim
               </Link>
 
-              <span
-                className="
-                  text-[var(--ares-border-dark)]
-                "
-              >
+              <span className="text-[var(--ares-border-dark)]">
                 /
               </span>
 
@@ -467,8 +479,7 @@ export default function ProductDetail({ product }) {
                     {gallery.map(
                       (image, index) => {
                         const active =
-                          activeImage ===
-                          image;
+                          activeImage === image;
 
                         return (
                           <button
@@ -476,7 +487,7 @@ export default function ProductDetail({ product }) {
                             type="button"
                             onClick={() =>
                               setActiveImage(
-                                image
+                                image,
                               )
                             }
                             aria-label={`${
@@ -505,13 +516,8 @@ export default function ProductDetail({ product }) {
 
                               ${
                                 active
-                                  ? `
-                                      opacity-100
-                                    `
-                                  : `
-                                      opacity-45
-                                      hover:opacity-100
-                                    `
+                                  ? "opacity-100"
+                                  : "opacity-45 hover:opacity-100"
                               }
                             `}
                           >
@@ -553,7 +559,7 @@ export default function ProductDetail({ product }) {
                             />
                           </button>
                         );
-                      }
+                      },
                     )}
                   </div>
                 )}
@@ -585,8 +591,7 @@ export default function ProductDetail({ product }) {
                   {gallery.map(
                     (image, index) => {
                       const active =
-                        activeImage ===
-                        image;
+                        activeImage === image;
 
                       return (
                         <button
@@ -594,7 +599,7 @@ export default function ProductDetail({ product }) {
                           type="button"
                           onClick={() =>
                             setActiveImage(
-                              image
+                              image,
                             )
                           }
                           aria-label={`${
@@ -652,7 +657,7 @@ export default function ProductDetail({ product }) {
                           )}
                         </button>
                       );
-                    }
+                    },
                   )}
                 </div>
               )}
@@ -730,18 +735,12 @@ export default function ProductDetail({ product }) {
                 </div>
 
                 {/* =========================================
-                    NAME + PRICE
+                    NAME + PRICE + RATING
                 ========================================== */}
 
                 <div
                   className="
                     mt-3
-
-                    flex
-                    items-end
-                    justify-between
-
-                    gap-6
 
                     border-b
                     border-[var(--ares-border)]
@@ -749,45 +748,68 @@ export default function ProductDetail({ product }) {
                     pb-4
                   "
                 >
-                  <h1
+                  <div
                     className="
-                      max-w-[310px]
+                      flex
+                      items-end
+                      justify-between
 
-                      font-editorial
-
-                      text-[34px]
-                      font-medium
-
-                      leading-[0.94]
-
-                      tracking-[-0.035em]
-
-                      text-[var(--ares-dark-deep)]
-
-                      sm:text-[40px]
-
-                      lg:text-[clamp(2rem,2.6vw,2.8rem)]
+                      gap-6
                     "
                   >
-                    {product?.name}
-                  </h1>
+                    <h1
+                      className="
+                        max-w-[310px]
 
-                  <p
-                    className="
-                      flex-shrink-0
+                        font-editorial
 
-                      pb-[2px]
+                        text-[34px]
+                        font-medium
 
-                      text-[11px]
-                      font-medium
+                        leading-[0.94]
 
-                      text-[var(--ares-dark-deep)]
+                        tracking-[-0.035em]
 
-                      xl:text-[12px]
-                    "
-                  >
-                    {product?.formattedPrice}
-                  </p>
+                        text-[var(--ares-dark-deep)]
+
+                        sm:text-[40px]
+
+                        lg:text-[clamp(2rem,2.6vw,2.8rem)]
+                      "
+                    >
+                      {product?.name}
+                    </h1>
+
+                    <p
+                      className="
+                        flex-shrink-0
+
+                        pb-[2px]
+
+                        text-[11px]
+                        font-medium
+
+                        text-[var(--ares-dark-deep)]
+
+                        xl:text-[12px]
+                      "
+                    >
+                      {product?.formattedPrice}
+                    </p>
+                  </div>
+
+                  {/* =======================================
+                      PRODUCT RATING
+                  ======================================== */}
+
+                  <div className="mt-4">
+                    <ProductRating
+                      productId={product?.id}
+                      onClick={() =>
+                        setReviewsOpen(true)
+                      }
+                    />
+                  </div>
                 </div>
 
                 {/* =========================================
@@ -842,7 +864,6 @@ export default function ProductDetail({ product }) {
                     <span
                       className="
                         flex
-
                         h-[24px]
                         w-[24px]
 
@@ -953,7 +974,7 @@ export default function ProductDetail({ product }) {
                             type="button"
                             onClick={() =>
                               handleSizeSelect(
-                                size
+                                size,
                               )
                             }
                             aria-pressed={
@@ -994,7 +1015,7 @@ export default function ProductDetail({ product }) {
                             {size}
                           </button>
                         );
-                      }
+                      },
                     )}
                   </div>
 
@@ -1015,8 +1036,7 @@ export default function ProductDetail({ product }) {
                         text-[#9f3a38]
                       "
                     >
-                      Lütfen bir beden
-                      seçin.
+                      Lütfen bir beden seçin.
                     </p>
                   )}
                 </div>
@@ -1056,7 +1076,6 @@ export default function ProductDetail({ product }) {
                   <div
                     className="
                       inline-flex
-
                       h-9
 
                       items-center
@@ -1071,9 +1090,7 @@ export default function ProductDetail({ product }) {
                         decreaseQuantity
                       }
                       aria-label="Adedi azalt"
-                      disabled={
-                        quantity <= 1
-                      }
+                      disabled={quantity <= 1}
                       className="
                         flex
                         h-full
@@ -1102,7 +1119,6 @@ export default function ProductDetail({ product }) {
                     <span
                       className="
                         flex
-
                         h-full
                         min-w-[38px]
 
@@ -1165,9 +1181,7 @@ export default function ProductDetail({ product }) {
                 >
                   <button
                     type="button"
-                    onClick={
-                      handleAddToCart
-                    }
+                    onClick={handleAddToCart}
                     className="
                       ares-button
 
@@ -1190,24 +1204,17 @@ export default function ProductDetail({ product }) {
                     )}
                   </button>
 
-                  {/* FAVORITE */}
-
                   <button
                     type="button"
-                    onClick={
-                      handleFavorite
-                    }
+                    onClick={handleFavorite}
                     aria-label={
                       favorite
                         ? "Favorilerden çıkar"
                         : "Favorilere ekle"
                     }
-                    aria-pressed={
-                      favorite
-                    }
+                    aria-pressed={favorite}
                     className={`
                       flex
-
                       h-[46px]
                       w-[46px]
 
@@ -1314,6 +1321,18 @@ export default function ProductDetail({ product }) {
         open={sizeGuideOpen}
         onClose={() =>
           setSizeGuideOpen(false)
+        }
+        product={product}
+      />
+
+      {/* ===================================================
+          PRODUCT REVIEWS
+      ==================================================== */}
+
+      <ReviewDrawer
+        open={reviewsOpen}
+        onClose={() =>
+          setReviewsOpen(false)
         }
         product={product}
       />

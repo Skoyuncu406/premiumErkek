@@ -9,6 +9,7 @@ import {
   X,
 } from "lucide-react";
 
+import ProductRating from "@/components/reviews/ProductRating";
 import useShopStore from "@/store/useShopStore";
 import { products } from "@/data/products";
 
@@ -18,29 +19,34 @@ import { products } from "@/data/products";
 
 export default function FavoritesPage() {
   const favorites = useShopStore(
-    (state) => state.favorites
+    (state) => state.favorites,
   );
 
   const toggleFavorite = useShopStore(
-    (state) => state.toggleFavorite
+    (state) => state.toggleFavorite,
   );
 
   /* =======================================================
      NORMALIZE FAVORITES
 
-     Favoride eski bir ürün kaydı varsa merkezi products.js
-     içindeki güncel ürünle ID üzerinden eşleştiriyoruz.
+     Eski localStorage kayıtlarında slug, image veya diğer
+     güncel ürün alanları eksik olabilir.
 
-     Böylece eski kayıtta slug bulunmasa bile ürün detay
-     sayfası doğru şekilde açılır.
+     Favori kaydını merkezi products.js verisiyle ID
+     üzerinden birleştirerek her zaman güncel ürünü
+     kullanıyoruz.
   ======================================================== */
 
-  const normalizedFavorites = favorites.map(
+  const safeFavorites = Array.isArray(favorites)
+    ? favorites
+    : [];
+
+  const normalizedFavorites = safeFavorites.map(
     (favorite) => {
       const currentProduct = products.find(
         (product) =>
           String(product.id) ===
-          String(favorite.id)
+          String(favorite.id),
       );
 
       if (!currentProduct) {
@@ -51,14 +57,14 @@ export default function FavoritesPage() {
         ...favorite,
         ...currentProduct,
       };
-    }
+    },
   );
 
   /* =======================================================
      EMPTY FAVORITES
   ======================================================== */
 
-  if (favorites.length === 0) {
+  if (normalizedFavorites.length === 0) {
     return <EmptyFavorites />;
   }
 
@@ -140,7 +146,7 @@ export default function FavoritesPage() {
               text-[var(--ares-muted-light)]
             "
           >
-            {favorites.length} ürün
+            {normalizedFavorites.length} ürün
           </span>
         </div>
 
@@ -171,32 +177,26 @@ export default function FavoritesPage() {
             xl:gap-x-7
           "
         >
-          {normalizedFavorites.map(
-            (product) => (
-              <FavoriteProduct
-                key={product.id}
-                product={product}
-                onRemove={() => {
-                  const originalFavorite =
-                    favorites.find(
-                      (favorite) =>
-                        String(
-                          favorite.id
-                        ) ===
-                        String(
-                          product.id
-                        )
-                    );
+          {normalizedFavorites.map((product) => (
+            <FavoriteProduct
+              key={product.id}
+              product={product}
+              onRemove={() => {
+                const originalFavorite =
+                  safeFavorites.find(
+                    (favorite) =>
+                      String(favorite.id) ===
+                      String(product.id),
+                  );
 
-                  if (originalFavorite) {
-                    toggleFavorite(
-                      originalFavorite
-                    );
-                  }
-                }}
-              />
-            )
-          )}
+                if (originalFavorite) {
+                  toggleFavorite(
+                    originalFavorite,
+                  );
+                }
+              }}
+            />
+          ))}
         </div>
 
         {/* =================================================
@@ -245,14 +245,19 @@ function FavoriteProduct({
 }) {
   /* =======================================================
      PRODUCT URL
-
-     Öncelik slug.
-     Eski kayıtlarda yalnızca href varsa onu kullan.
   ======================================================== */
 
   const productHref = product.slug
     ? `/urunler/${product.slug}`
     : product.href || "/urunler";
+
+  /* =======================================================
+     REVIEW URL
+  ======================================================== */
+
+  const reviewHref = product.slug
+    ? `/urunler/${product.slug}?reviews=1`
+    : productHref;
 
   /* =======================================================
      PRODUCT IMAGE
@@ -262,6 +267,10 @@ function FavoriteProduct({
     product.image ||
     product.images?.[0] ||
     "/images/products/product-01.jpg";
+
+  /* =======================================================
+     RENDER
+  ======================================================== */
 
   return (
     <article
@@ -298,7 +307,11 @@ function FavoriteProduct({
             src={productImage}
             alt={product.name}
             fill
-            sizes="(max-width: 767px) 50vw, (max-width: 1279px) 33vw, 25vw"
+            sizes="
+              (max-width: 767px) 50vw,
+              (max-width: 1279px) 33vw,
+              25vw
+            "
             className="
               object-cover
               object-center
@@ -313,7 +326,9 @@ function FavoriteProduct({
           />
         </Link>
 
-        {/* NEW */}
+        {/* =================================================
+            NEW
+        ================================================== */}
 
         {product.isNew && (
           <span
@@ -344,7 +359,9 @@ function FavoriteProduct({
           </span>
         )}
 
-        {/* REMOVE FAVORITE */}
+        {/* =================================================
+            REMOVE FAVORITE
+        ================================================== */}
 
         <button
           type="button"
@@ -354,7 +371,6 @@ function FavoriteProduct({
             absolute
             right-3
             top-3
-
             z-10
 
             flex
@@ -376,6 +392,9 @@ function FavoriteProduct({
             hover:bg-[var(--ares-dark)]
             hover:text-[var(--ares-background-soft)]
 
+            focus:outline-none
+            focus-visible:outline-none
+
             sm:right-4
             sm:top-4
           "
@@ -392,6 +411,8 @@ function FavoriteProduct({
       ==================================================== */}
 
       <div className="pt-4">
+        {/* CATEGORY */}
+
         <p
           className="
             text-[7px]
@@ -408,7 +429,9 @@ function FavoriteProduct({
           {product.category}
         </p>
 
-        {/* NAME + PRICE */}
+        {/* =================================================
+            NAME + PRICE
+        ================================================== */}
 
         <div
           className="
@@ -467,7 +490,9 @@ function FavoriteProduct({
           </span>
         </div>
 
-        {/* COLOR */}
+        {/* =================================================
+            COLOR
+        ================================================== */}
 
         <p
           className="
@@ -483,48 +508,80 @@ function FavoriteProduct({
           {product.color}
         </p>
 
-        {/* PRODUCT LINK */}
+        {/* =================================================
+            PRODUCT RATING
+        ================================================== */}
 
         <Link
-          href={productHref}
+          href={reviewHref}
+          aria-label={`${product.name} değerlendirmelerini görüntüle`}
           className="
-            group/link
-
-            mt-4
+            mt-2.5
 
             inline-flex
-            items-center
-            gap-2
+            max-w-full
 
-            text-[7px]
-            font-semibold
+            outline-none
 
-            uppercase
-            tracking-[0.12em]
-
-            text-[var(--ares-muted)]
-
-            transition-colors
+            transition-opacity
             duration-300
 
-            hover:text-[var(--ares-dark-deep)]
+            hover:opacity-65
 
-            sm:text-[8px]
+            focus:outline-none
+            focus-visible:outline-none
           "
         >
-          Ürünü İncele
-
-          <ArrowRight
-            size={11}
-            strokeWidth={1.2}
-            className="
-              transition-transform
-              duration-300
-
-              group-hover/link:translate-x-1
-            "
+          <ProductRating
+            productId={product.id}
+            compact
           />
         </Link>
+
+        {/* =================================================
+            PRODUCT LINK
+        ================================================== */}
+
+        <div className="mt-4">
+          <Link
+            href={productHref}
+            className="
+              group/link
+
+              inline-flex
+              items-center
+              gap-2
+
+              text-[7px]
+              font-semibold
+
+              uppercase
+              tracking-[0.12em]
+
+              text-[var(--ares-muted)]
+
+              transition-colors
+              duration-300
+
+              hover:text-[var(--ares-dark-deep)]
+
+              sm:text-[8px]
+            "
+          >
+            Ürünü İncele
+
+            <ArrowRight
+              size={11}
+              strokeWidth={1.2}
+              className="
+                transition-transform
+                duration-300
+
+                group-hover/link:translate-x-1
+              "
+            />
+          </Link>
+        </div>
       </div>
     </article>
   );
@@ -623,9 +680,10 @@ function EmptyFavorites() {
             sm:text-[11px]
           "
         >
-          Beğendiğiniz parçaları kalp simgesine
-          dokunarak favorilerinize ekleyebilir ve
-          daha sonra burada tekrar bulabilirsiniz.
+          Beğendiğiniz parçaları kalp
+          simgesine dokunarak favorilerinize
+          ekleyebilir ve daha sonra burada
+          tekrar bulabilirsiniz.
         </p>
 
         <Link

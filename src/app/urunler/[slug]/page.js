@@ -5,6 +5,10 @@ import ProductDetail from "@/components/products/ProductDetail";
 
 import { products } from "@/data/products";
 
+/* =========================================================
+   METADATA
+========================================================= */
+
 export async function generateMetadata({ params }) {
   const { slug } = await params;
 
@@ -22,8 +26,18 @@ export async function generateMetadata({ params }) {
   };
 }
 
-export default async function ProductPage({ params }) {
+/* =========================================================
+   PRODUCT PAGE
+========================================================= */
+
+export default async function ProductPage({ params, searchParams }) {
   const { slug } = await params;
+
+  const resolvedSearchParams = await searchParams;
+
+  /* =======================================================
+     PRODUCT
+  ======================================================== */
 
   const product = products.find((item) => item.slug === slug);
 
@@ -31,11 +45,28 @@ export default async function ProductPage({ params }) {
     notFound();
   }
 
+  /* =======================================================
+     REVIEWS
+  ======================================================== */
+
+  const openReviews = resolvedSearchParams?.reviews === "1";
+
+  /* =======================================================
+     RENDER
+  ======================================================== */
+
   return (
-    <main className="min-h-screen lg:h-screen lg:overflow-hidden">
+    <main
+      className="
+        min-h-screen
+
+        lg:h-screen
+        lg:overflow-hidden
+      "
+    >
       <Navbar />
 
-      <ProductDetail product={product} />
+      <ProductDetail product={product} openReviews={openReviews} />
     </main>
   );
 }
